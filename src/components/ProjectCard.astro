@@ -1,0 +1,86 @@
+---
+import type { Project } from "../lib/data";
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+
+const tagNames = project.tags.map((t) => t.name).join(",");
+const Wrapper = project.link ? "a" : "div";
+const wrapperProps = project.link
+  ? { href: project.link, target: "_blank", rel: "noopener noreferrer" }
+  : {};
+---
+
+<Wrapper
+  {...wrapperProps}
+  class="project-card reveal glass group flex flex-col overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1.5 hover:border-apple-blue/40"
+  data-tags={tagNames}
+  data-status={project.status}
+>
+  <div class="relative aspect-video overflow-hidden bg-apple-dark">
+    {
+      project.cover ? (
+        <img
+          src={project.cover}
+          alt={project.name}
+          loading="lazy"
+          decoding="async"
+          class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      ) : (
+        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-apple-dark to-black">
+          <span class="font-hand text-4xl text-white/20">{project.name}</span>
+        </div>
+      )
+    }
+    {
+      project.status && (
+        <span
+          class="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-medium text-white backdrop-blur"
+          style={`background:${project.statusColor}cc`}
+        >
+          {project.status}
+        </span>
+      )
+    }
+  </div>
+
+  <div class="flex flex-1 flex-col p-6">
+    <div class="mb-2 flex items-center gap-2">
+      {
+        project.icon && (
+          <img
+            src={project.icon}
+            alt=""
+            loading="lazy"
+            class="h-6 w-6 rounded object-contain"
+          />
+        )
+      }
+      <h3 class="text-lg font-semibold text-apple-light">{project.name}</h3>
+    </div>
+
+    {
+      project.description && (
+        <p class="mb-4 line-clamp-2 text-sm leading-relaxed text-apple-gray">
+          {project.description}
+        </p>
+      )
+    }
+
+    <div class="mt-auto flex flex-wrap gap-2 pt-2">
+      {
+        project.tags.map((t) => (
+          <span
+            class="rounded-full px-2.5 py-1 text-xs font-medium"
+            style={`background:${t.color}22;color:${t.color}`}
+          >
+            {t.name}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</Wrapper>

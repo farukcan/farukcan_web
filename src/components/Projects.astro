@@ -1,0 +1,83 @@
+---
+import type { SiteData } from "../lib/data";
+import ProjectCard from "./ProjectCard.astro";
+
+interface Props {
+  data: SiteData;
+}
+const { data } = Astro.props;
+
+const filters = ["All", ...data.categories];
+---
+
+<section id="projects" class="relative border-t border-white/5 py-28">
+  <div class="mx-auto max-w-6xl px-6">
+    <div
+      class="reveal mb-10 flex flex-wrap items-end justify-between gap-6"
+    >
+      <div>
+        <p class="font-hand text-2xl text-apple-blue">Portfolio</p>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          {data.projects.length} Projects
+        </h2>
+      </div>
+    </div>
+
+    <!-- Filter chips -->
+    <div id="project-filters" class="reveal mb-10 flex flex-wrap gap-2">
+      {
+        filters.map((f, i) => (
+          <button
+            class:list={[
+              "filter-btn rounded-full border px-4 py-2 text-sm font-medium transition-all",
+              i === 0
+                ? "border-apple-blue bg-apple-blue text-white"
+                : "border-white/10 text-apple-gray hover:text-apple-light",
+            ]}
+            data-filter={f}
+          >
+            {f}
+          </button>
+        ))
+      }
+    </div>
+
+    <div
+      id="project-grid"
+      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      {data.projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </div>
+</section>
+
+<script>
+  const buttons =
+    document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+  const cards =
+    document.querySelectorAll<HTMLElement>(".project-card");
+
+  const activeCls = ["border-apple-blue", "bg-apple-blue", "text-white"];
+  const idleCls = ["border-white/10", "text-apple-gray"];
+
+  function setActive(btn: HTMLButtonElement) {
+    buttons.forEach((b) => {
+      b.classList.remove(...activeCls);
+      b.classList.add(...idleCls);
+    });
+    btn.classList.remove(...idleCls);
+    btn.classList.add(...activeCls);
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const filter = btn.dataset.filter ?? "All";
+      setActive(btn);
+      cards.forEach((card) => {
+        const tags = (card.dataset.tags ?? "").split(",");
+        const show = filter === "All" || tags.includes(filter);
+        card.style.display = show ? "" : "none";
+      });
+    });
+  });
+</script>

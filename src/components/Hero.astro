@@ -1,0 +1,113 @@
+---
+import type { SiteData } from "../lib/data";
+
+interface Props {
+  data: SiteData;
+}
+const { data } = Astro.props;
+---
+
+<section
+  id="hero"
+  class="relative flex min-h-screen items-center overflow-hidden pb-20 pt-32"
+>
+  <!-- Ambient gradient glows -->
+  <div
+    class="animate-pulseGlow pointer-events-none absolute -left-40 top-20 h-96 w-96 rounded-full bg-apple-blue/20 blur-[120px]"
+  >
+  </div>
+  <div
+    class="animate-pulseGlow pointer-events-none absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-apple-purple/20 blur-[120px]"
+  >
+  </div>
+
+  <div class="mx-auto w-full max-w-5xl px-6">
+    <p
+      class="animate-fadeInUp mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-apple-gray"
+    >
+      <span class="h-2 w-2 rounded-full bg-apple-green"></span>
+      Hello, I'm {data.name}
+    </p>
+
+    <h1
+      class="animate-fadeInUp mb-6 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+      style="animation-delay:.1s"
+    >
+      <span class="text-gradient">{data.role}</span>
+    </h1>
+
+    <p
+      class="animate-fadeInUp mb-10 max-w-2xl text-lg leading-relaxed text-apple-gray"
+      style="animation-delay:.2s"
+    >
+      {data.tagline}
+    </p>
+
+    <div
+      class="animate-fadeInUp flex flex-wrap gap-4"
+      style="animation-delay:.3s"
+    >
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="#contact" class="btn-ghost">Get in touch</a>
+    </div>
+
+    <!-- Stats -->
+    <div
+      class="animate-fadeInUp mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4"
+      style="animation-delay:.4s"
+    >
+      {
+        data.stats.map((s) => (
+          <div class="glass rounded-2xl px-5 py-6">
+            <div class="text-3xl font-bold text-apple-light">{s.value}</div>
+            <div class="mt-1 text-sm text-apple-gray">{s.label}</div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Upwork trust badge -->
+    <div
+      class="animate-fadeInUp mx-auto mt-12 max-w-4xl"
+      style="animation-delay:.5s"
+    >
+      <div
+        class="group relative overflow-hidden rounded-3xl border border-[#14A800]/25 bg-apple-dark/30 p-6 backdrop-blur-xl"
+      >
+        <div
+          class="relative z-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8"
+        >
+          <span class="text-2xl font-bold tracking-tight text-[#14A800]"
+            >Upwork</span
+          >
+          <div class="hidden h-8 w-px bg-white/10 sm:block"></div>
+          <div class="flex items-center gap-2">
+            <span
+              class="flex h-6 w-6 items-center justify-center rounded-full bg-[#14A800]"
+            >
+              <svg
+                class="h-4 w-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M5 13l4 4L19 7"></path>
+              </svg>
+            </span>
+            <span class="text-lg font-semibold text-apple-light"
+              >Top Rated Plus</span
+            >
+          </div>
+          <div class="hidden h-8 w-px bg-white/10 sm:block"></div>
+          <div class="text-lg font-semibold text-apple-light">
+            100% Job Success
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

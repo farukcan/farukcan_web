@@ -1,0 +1,68 @@
+---
+import type { SiteData } from "../lib/data";
+
+interface Props {
+  data: SiteData;
+}
+const { data } = Astro.props;
+
+// Duplicate the tag list so the marquee scrolls seamlessly.
+const marquee = [...data.techTags, ...data.techTags];
+---
+
+<!-- About / marquee -->
+<section id="about" class="relative border-t border-white/5 py-28">
+  <div class="mx-auto max-w-5xl px-6">
+    <p class="reveal font-hand text-2xl text-apple-blue">What I do</p>
+    <h2
+      class="reveal mt-2 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl"
+    >
+      {data.description}
+    </h2>
+  </div>
+
+  <div class="reveal relative mt-16 overflow-hidden py-4">
+    <div class="animate-marquee flex w-max gap-3">
+      {
+        marquee.map((t) => (
+          <span class="glass whitespace-nowrap rounded-full px-5 py-2 text-sm text-apple-gray">
+            {t}
+          </span>
+        ))
+      }
+    </div>
+    <div
+      class="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-apple-black to-transparent"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-apple-black to-transparent"
+    >
+    </div>
+  </div>
+</section>
+
+<!-- Skill sections -->
+<section id="skills" class="relative border-t border-white/5 py-28">
+  <div class="mx-auto max-w-5xl px-6">
+    <div class="reveal mb-14">
+      <p class="font-hand text-2xl text-apple-blue">Expertise</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+        Skills & Services
+      </h2>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      {
+        data.skills.map((s) => (
+          <div class="reveal glass group rounded-3xl p-8 transition-all duration-500 hover:-translate-y-1 hover:border-apple-blue/40">
+            <h3 class="mb-4 text-xl font-semibold text-apple-light">
+              {s.title}
+            </h3>
+            <div class="prose-notion" set:html={s.bodyHtml} />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

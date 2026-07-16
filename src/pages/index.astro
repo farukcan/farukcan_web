@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/Hero.astro";
+import Skills from "../components/Skills.astro";
+import Projects from "../components/Projects.astro";
+import Contact from "../components/Contact.astro";
+import Footer from "../components/Footer.astro";
+import { getSiteData } from "../lib/data";
+
+// Fetched at build time — rerunning the build re-syncs from farukcan.dev/api.json.
+const data = await getSiteData();
+---
+
+<Base
+  title={`${data.name} — ${data.role}`}
+  description={data.description}
+>
+  <Nav name={data.name} />
+  <main>
+    <Hero data={data} />
+    <Projects data={data} />
+    <Skills data={data} />
+    <Contact data={data} />
+  </main>
+  <Footer data={data} />
+</Base>

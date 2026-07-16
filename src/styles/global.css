@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+  body {
+    background: #000;
+  }
+}
+
+@layer components {
+  /* Frosted-glass surface used for nav and cards. */
+  .glass {
+    background: rgba(28, 28, 30, 0.5);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Animated Apple-style gradient headline. */
+  .text-gradient {
+    background: linear-gradient(
+      90deg,
+      #2997ff,
+      #bf5af2,
+      #ff2d55,
+      #ff9500,
+      #2997ff
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient 8s ease infinite;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-apple-blue px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:brightness-110 hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-apple-light transition-all duration-300 hover:bg-white/5 hover:-translate-y-0.5;
+  }
+}
+
+@layer utilities {
+  /* Scroll-reveal: elements start hidden, JS toggles .is-visible. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Rendered Notion HTML inside skill cards. */
+.prose-notion {
+  color: #b0b0b5;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+.prose-notion p {
+  margin-bottom: 0.75rem;
+}
+.prose-notion ul,
+.prose-notion ol {
+  margin: 0.5rem 0 0.75rem 1.1rem;
+  list-style: disc;
+}
+.prose-notion ol {
+  list-style: decimal;
+}
+.prose-notion li {
+  margin-bottom: 0.35rem;
+}
+.prose-notion a {
+  color: #2997ff;
+}
+.prose-notion strong {
+  color: #f5f5f7;
+}

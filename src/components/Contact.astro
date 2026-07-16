@@ -1,0 +1,40 @@
+---
+import type { SiteData } from "../lib/data";
+
+interface Props {
+  data: SiteData;
+}
+const { data } = Astro.props;
+---
+
+<section id="contact" class="relative border-t border-white/5 py-28">
+  <div class="mx-auto max-w-3xl px-6 text-center">
+    <div
+      class="animate-pulseGlow pointer-events-none absolute left-1/2 top-1/2 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-apple-blue/15 blur-[120px]"
+    >
+    </div>
+    <p class="reveal font-hand text-2xl text-apple-blue">Get in touch</p>
+    <h2 class="reveal mt-2 text-3xl font-bold tracking-tight sm:text-5xl">
+      Let's build something together
+    </h2>
+    <p class="reveal mx-auto mt-5 max-w-xl text-lg text-apple-gray">
+      Available for freelance projects, consulting and collaborations. Reach me
+      on any of the platforms below.
+    </p>
+
+    <div class="reveal mt-10 flex flex-wrap justify-center gap-3">
+      {
+        data.socials.map((s) => (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="glass rounded-full px-5 py-3 text-sm font-medium text-apple-light transition-all hover:-translate-y-0.5 hover:border-apple-blue/40"
+          >
+            {s.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
