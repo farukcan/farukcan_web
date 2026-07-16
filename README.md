@@ -35,10 +35,22 @@ flowchart LR
 | ------------ | ------------------ |
 | Hero role/tagline | `homePage.content` callout + `configuration` |
 | Skills cards | `homePage.content` `<details>` blocks |
-| Tech marquee | project `Tags` (deduped) |
+| Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
 | Projects grid | `databases[<id>].list` (Name, Status, Tags, Link, cover/icon, description) |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://farukcan.dev` (Notion S3 signed URLs expire and
 are intentionally not used).
+
+## Branding assets
+
+Logo and favicons mirror [farukcan.dev](https://farukcan.dev) (sourced from
+`farukcan/farukcan.github.io` images). They live in [`public/`](public/):
+
+| File | Use |
+| ---- | --- |
+| `logo.png` / `android-chrome-512x512.png` | Nav logo, OG/Twitter image |
+| `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` | Browser favicon |
+| `apple-touch-icon.png` | iOS home screen |
+| `android-chrome-192x192.png` | PWA-style icon |

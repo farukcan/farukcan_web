@@ -6,8 +6,35 @@ interface Props {
 }
 const { data } = Astro.props;
 
-// Duplicate the tag list so the marquee scrolls seamlessly.
-const marquee = [...data.techTags, ...data.techTags];
+const ROW_COUNT = 3;
+
+/** Deterministic shuffle so SSR output is stable across builds. */
+function shuffle<T>(items: T[], seed: number): T[] {
+  const arr = [...items];
+  let s = seed >>> 0;
+  for (let i = arr.length - 1; i > 0; i--) {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    const j = s % (i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Per-row order, direction, speed, and phase — looks random, stays build-stable.
+const rows = Array.from({ length: ROW_COUNT }, (_, row) => {
+  let tags = shuffle(data.techTags, 0x9e3779b9 + row * 2654435761);
+  // Pad just enough to fill wide viewports without bloating the DOM.
+  while (tags.length > 0 && tags.length < 10) tags = [...tags, ...tags];
+  return {
+    // Two identical halves for a seamless -50% loop.
+    tags: [...tags, ...tags],
+    reverse: row % 2 === 1,
+    // Staggered durations (seconds) — slower base so motion stays calm.
+    duration: 55 + ((row * 13 + 7) % 25),
+    // Phase offset so rows don't start aligned.
+    delay: -((row * 11) % 23),
+  };
+});
 ---
 
 <!-- About / marquee -->
@@ -21,23 +48,32 @@ const marquee = [...data.techTags, ...data.techTags];
     </h2>
   </div>
 
-  <div class="reveal relative mt-16 overflow-hidden py-4">
-    <div class="animate-marquee flex w-max gap-3">
+  <!--
+    No .reveal / .glass here:
+    - reveal transform fights marquee translate
+    - glass backdrop-filter on moving pills causes jank
+  -->
+  <div
+    class="relative mt-16 overflow-hidden py-2 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
+  >
+    <div class="flex flex-col gap-3">
       {
-        marquee.map((t) => (
-          <span class="glass whitespace-nowrap rounded-full px-5 py-2 text-sm text-apple-gray">
-            {t}
-          </span>
+        rows.map((row) => (
+          <div
+            class:list={[
+              "flex w-max gap-3 transform-gpu will-change-transform backface-hidden",
+              row.reverse ? "animate-marqueeReverse" : "animate-marquee",
+            ]}
+            style={`animation-duration:${row.duration}s;animation-delay:${row.delay}s`}
+          >
+            {row.tags.map((t) => (
+              <span class="whitespace-nowrap rounded-full border border-white/10 bg-apple-dark/90 px-5 py-2 text-sm text-apple-gray">
+                {t}
+              </span>
+            ))}
+          </div>
         ))
       }
-    </div>
-    <div
-      class="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-apple-black to-transparent"
-    >
-    </div>
-    <div
-      class="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-apple-black to-transparent"
-    >
     </div>
   </div>
 </section>
