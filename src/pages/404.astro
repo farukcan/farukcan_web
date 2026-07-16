@@ -13,15 +13,16 @@
     <script is:inline>
       (function () {
         var path = location.pathname.replace(/^\/+|\/+$/g, "");
+        var search = location.search;
         if (path && path.indexOf(".") === -1) {
           if (path === "games") {
-            location.replace("/#projects");
+            location.replace("/?no-contact-info=yes#projects");
             return;
           }
-          location.replace("/#" + path);
+          location.replace("/" + search + "#" + path);
           return;
         }
-        location.replace("/");
+        location.replace("/" + search);
       })();
     </script>
     <noscript>

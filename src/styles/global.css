@@ -10,6 +10,16 @@
   body {
     background: #000;
   }
+  /* Activated by ?no-contact-info=yes (see Base.astro head script). */
+  html[data-no-contact-info] [data-contact] {
+    display: none !important;
+  }
+  [data-contact-hidden-msg] {
+    display: none;
+  }
+  html[data-no-contact-info] [data-contact-hidden-msg] {
+    display: block;
+  }
 }
 
 @layer components {

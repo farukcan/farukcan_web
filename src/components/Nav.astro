@@ -8,7 +8,7 @@ const links = [
   { href: "#projects", label: "Projects" },
   { href: "#about", label: "About" },
   { href: "#skills", label: "Skills" },
-  { href: "#contact", label: "Contact" },
+  { href: "#contact", label: "Contact", contact: true },
 ];
 ---
 
@@ -32,7 +32,7 @@ const links = [
     <ul class="hidden items-center gap-8 text-sm text-apple-gray md:flex">
       {
         links.map((l) => (
-          <li>
+          <li {...(l.contact ? { "data-contact": "" } : {})}>
             <a href={l.href} class="transition-colors hover:text-apple-light">
               {l.label}
             </a>
@@ -40,6 +40,8 @@ const links = [
         ))
       }
     </ul>
-    <a href="#contact" class="btn-primary !px-5 !py-2 text-xs">Get in touch</a>
+    <a href="#contact" data-contact class="btn-primary !px-5 !py-2 text-xs"
+      >Get in touch</a
+    >
   </nav>
 </header>
