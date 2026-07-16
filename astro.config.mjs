@@ -5,5 +5,14 @@ import tailwind from "@astrojs/tailwind";
 export default defineConfig({
   site: "https://farukcan.dev",
   output: "static",
-  integrations: [tailwind()],
+  // global.css already includes @tailwind base/components/utilities.
+  integrations: [tailwind({ applyBaseStyles: false })],
+  image: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "old.farukcan.dev",
+      },
+    ],
+  },
 });

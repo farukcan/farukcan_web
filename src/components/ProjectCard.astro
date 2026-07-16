@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { Project } from "../lib/data";
 
 interface Props {
@@ -11,6 +12,9 @@ const Wrapper = project.link ? "a" : "div";
 const wrapperProps = project.link
   ? { href: project.link, target: "_blank", rel: "noopener noreferrer" }
   : {};
+
+// Grid: 1 col mobile, 2 from sm, 3 from lg (max-w-6xl ≈ 1152px).
+const coverSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 ---
 
 <Wrapper
@@ -22,9 +26,12 @@ const wrapperProps = project.link
   <div class="relative aspect-video overflow-hidden bg-apple-dark">
     {
       project.cover ? (
-        <img
+        <Image
           src={project.cover}
           alt={project.name}
+          width={640}
+          height={360}
+          sizes={coverSizes}
           loading="lazy"
           decoding="async"
           class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -51,10 +58,13 @@ const wrapperProps = project.link
     <div class="mb-2 flex items-center gap-2">
       {
         project.icon && (
-          <img
+          <Image
             src={project.icon}
             alt=""
+            width={24}
+            height={24}
             loading="lazy"
+            decoding="async"
             class="h-6 w-6 rounded object-contain"
           />
         )

@@ -41,8 +41,20 @@ flowchart LR
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/logo.png`) |
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
-`/assets/...` paths served from `https://farukcan.dev` (Notion S3 signed URLs expire and
+`/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
 are intentionally not used).
+
+## Performance
+
+Build-time optimizations keep the static site on a single origin at runtime:
+
+| Topic | Approach |
+| ----- | -------- |
+| Handwriting font (Caveat) | Self-hosted via `@fontsource/caveat` (latin 400 only); no Google Fonts |
+| Project covers / icons | Astro `<Image>` + `sharp`; remote URLs from `old.farukcan.dev` authorized in [`astro.config.mjs`](astro.config.mjs) and optimized into `dist/_astro/` at build |
+| Cache | [`public/_headers`](public/_headers) for Cloudflare Pages: hashed `/_astro/*` immutable; `/`, `/index.html`, `/404.html` short TTL (no catch-all `/*`, so rules do not merge) |
+
+Each deploy still needs `api.json` **and** reachable cover/icon URLs; a missing remote image fails the build.
 
 ## Branding assets
 
@@ -73,7 +85,9 @@ Static Astro output (`dist/`) deploys directly to Cloudflare Pages. No adapter r
 | Root directory | `/` (repo root) |
 | Node version | `20` (via [`.nvmrc`](.nvmrc) or env `NODE_VERSION=20`) |
 
-Each deploy re-fetches `https://farukcan.dev/api.json`. If that endpoint is down, the build fails.
+[`public/_headers`](public/_headers) is copied into `dist/` and applied by Cloudflare Pages automatically (long-cache for `/_astro/*`, 1h for HTML).
+
+Each deploy re-fetches `https://farukcan.dev/api.json` and optimizes remote project images. If the API or those images are down, the build fails.
 
 ### Path → hash redirects
 
