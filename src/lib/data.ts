@@ -1,9 +1,8 @@
 import { parse } from "node-html-parser";
-import localSnapshot from "../data/api.json";
 
 // Source of truth. The site rebuilds itself from this endpoint on every build.
-const REMOTE_URL = "https://farukcan.dev/api.json";
 const ORIGIN = "https://farukcan.dev";
+const REMOTE_URL = `${ORIGIN}/api.json`;
 const PROJECTS_DB_ID = "59410d89-1e49-4c5a-b22d-6a892432ee04";
 
 export type Social = {
@@ -73,17 +72,9 @@ function absUrl(url: string | null | undefined): string | null {
 }
 
 async function loadRaw(): Promise<unknown> {
-  try {
-    const res = await fetch(REMOTE_URL);
-    if (!res.ok) throw new Error(`api.json responded ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    // Build must not fail when the endpoint is unreachable: use the snapshot.
-    console.warn(
-      `[data] remote fetch failed, using local snapshot: ${(err as Error).message}`,
-    );
-    return localSnapshot;
-  }
+  const res = await fetch(REMOTE_URL);
+  if (!res.ok) throw new Error(`api.json responded ${res.status}`);
+  return await res.json();
 }
 
 const SOCIAL_MAP: { match: string; label: string }[] = [
@@ -198,10 +189,10 @@ export async function getSiteData(): Promise<SiteData> {
     projects,
     categories,
     stats: [
-      { value: "6+", label: "Years Experience" },
+      { value: "10+", label: "Years Experience" },
       { value: `${projects.length}`, label: "Projects" },
       { value: `${gameCount}+`, label: "Games Shipped" },
-      { value: "10+", label: "Languages" },
+      { value: "6+", label: "Programming Languages" },
     ],
     generatedAt: new Date().toISOString(),
   };

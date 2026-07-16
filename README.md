@@ -16,17 +16,15 @@ npm run preview  # preview the production build
 
 ## How it self-updates
 
-The build fetches live data from the API. If the endpoint is unreachable, it falls back
-to the committed snapshot at `src/data/api.json`, so builds never fail offline. To refresh
-the snapshot, re-download the JSON into that path.
+Both `dev` and `build` fetch live data from `https://farukcan.dev/api.json`. If the
+endpoint is unreachable, the command fails — there is no local snapshot fallback.
 
 ```mermaid
 flowchart LR
     A[npm run build] --> B[getSiteData]
     B -->|fetch| C[farukcan.dev/api.json]
     C -->|ok| E[transform]
-    C -->|fail| D[src/data/api.json snapshot]
-    D --> E
+    C -->|fail| X[build fails]
     E --> F[Astro renders sections]
     F --> G[dist/ static site]
 ```
