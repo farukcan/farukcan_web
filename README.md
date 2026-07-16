@@ -53,7 +53,8 @@ Logo and favicons mirror [farukcan.dev](https://farukcan.dev) (sourced from
 | `logo.png` / `android-chrome-512x512.png` | Nav logo, OG/Twitter image |
 | `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` | Browser favicon |
 | `apple-touch-icon.png` | iOS home screen |
-| `android-chrome-192x192.png` | PWA-style icon |
+| `android-chrome-192x192.png` / `android-chrome-512x512.png` | Web app manifest icons |
+| `manifest.webmanifest` | Install / Add to Home Screen metadata |
 
 ## Cloudflare Pages
 
