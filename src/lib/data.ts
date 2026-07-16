@@ -1,7 +1,7 @@
 import { parse } from "node-html-parser";
 
 // Source of truth. The site rebuilds itself from this endpoint on every build.
-const ORIGIN = "https://farukcan.dev";
+const ORIGIN = "https://old.farukcan.dev";
 const REMOTE_URL = `${ORIGIN}/api.json`;
 const PROJECTS_DB_ID = "59410d89-1e49-4c5a-b22d-6a892432ee04";
 

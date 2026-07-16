@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Faruk Can personal website - static build from farukcan.dev/api.json",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

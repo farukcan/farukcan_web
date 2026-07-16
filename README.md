@@ -54,3 +54,21 @@ Logo and favicons mirror [farukcan.dev](https://farukcan.dev) (sourced from
 | `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` | Browser favicon |
 | `apple-touch-icon.png` | iOS home screen |
 | `android-chrome-192x192.png` | PWA-style icon |
+
+## Cloudflare Pages
+
+Static Astro output (`dist/`) deploys directly to Cloudflare Pages. No adapter required.
+
+1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Connect to Git**
+2. Select this repo and use the build settings below
+3. (Optional) Attach a custom domain and point DNS at Cloudflare
+
+| Setting | Value |
+| ------- | ----- |
+| Framework preset | Astro (or None) |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Root directory | `/` (repo root) |
+| Node version | `20` (via [`.nvmrc`](.nvmrc) or env `NODE_VERSION=20`) |
+
+Each deploy re-fetches `https://farukcan.dev/api.json`. If that endpoint is down, the build fails.
