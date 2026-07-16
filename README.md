@@ -72,3 +72,7 @@ Static Astro output (`dist/`) deploys directly to Cloudflare Pages. No adapter r
 | Node version | `20` (via [`.nvmrc`](.nvmrc) or env `NODE_VERSION=20`) |
 
 Each deploy re-fetches `https://farukcan.dev/api.json`. If that endpoint is down, the build fails.
+
+### Path → hash redirects
+
+Unknown paths are handled by [`src/pages/404.astro`](src/pages/404.astro): `/$x` redirects client-side to `/#$x` (e.g. `/games` → `/#games`). Paths that look like files (contain a `.`) fall back to `/`. This avoids a catch-all `_redirects` rule, which on Cloudflare Pages would override real static assets.
