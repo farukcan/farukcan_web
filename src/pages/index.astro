@@ -15,6 +15,9 @@ const data = await getSiteData();
 <Base
   title={`${data.name} — ${data.role}`}
   description={data.description}
+  siteName={data.name}
+  siteUrl={data.siteUrl}
+  twitterUsername={data.twitterUsername}
 >
   <Nav name={data.name} />
   <main>

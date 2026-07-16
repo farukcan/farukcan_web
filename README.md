@@ -38,6 +38,7 @@ flowchart LR
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
 | Projects grid | `databases[<id>].list` (Name, Status, Tags, Link, cover/icon, description) |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
+| Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/logo.png`) |
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://farukcan.dev` (Notion S3 signed URLs expire and

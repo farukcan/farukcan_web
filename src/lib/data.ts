@@ -36,6 +36,8 @@ export type SiteData = {
   tagline: string;
   description: string;
   footer: string;
+  siteUrl: string;
+  twitterUsername: string;
   socials: Social[];
   skills: SkillSection[];
   techTags: string[];
@@ -177,13 +179,17 @@ export async function getSiteData(): Promise<SiteData> {
     p.tags.some((t) => t.name === "Game"),
   ).length;
 
+  const twitterUsername = (config.twitter_username ?? "").replace(/^@/, "");
+
   return {
     name: config.title ?? "Faruk Can",
     role: "Software Engineer",
     tagline: extractTagline(homeContent),
     description: config.description ?? "",
     footer: config.footer_description ?? "",
-    socials: extractSocials(homeContent, config.twitter_username ?? ""),
+    siteUrl: config.site_url ?? "https://farukcan.dev",
+    twitterUsername,
+    socials: extractSocials(homeContent, twitterUsername),
     skills: extractSkills(homeContent),
     techTags,
     projects,
