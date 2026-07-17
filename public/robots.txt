@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://farukcan.dev/sitemap-index.xml

@@ -11,7 +11,7 @@ interface Props {
 
 const { title, description, siteName, siteUrl, twitterUsername } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
-const ogImage = new URL("/logo.png", siteUrl).href;
+const ogImage = new URL("/og.png", siteUrl).href;
 const twitterHandle = twitterUsername
   ? twitterUsername.replace(/^@/, "")
   : undefined;
@@ -32,6 +32,8 @@ const twitterHandle = twitterUsername
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={siteName} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -53,6 +55,7 @@ const twitterHandle = twitterUsername
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <script is:inline>
+      document.documentElement.classList.add("js");
       // Hide contact UI before paint when ?no-contact-info=yes
       if (
         new URLSearchParams(location.search).get("no-contact-info") === "yes"

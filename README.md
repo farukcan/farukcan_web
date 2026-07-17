@@ -38,7 +38,7 @@ flowchart LR
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
 | Projects grid | `databases[<id>].list` (Name, Status, Tags, Link, cover/icon, description) |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
-| Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/logo.png`) |
+| Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
@@ -52,7 +52,8 @@ Build-time optimizations keep the static site on a single origin at runtime:
 | ----- | -------- |
 | Handwriting font (Caveat) | Self-hosted via `@fontsource/caveat` (latin 400 only); no Google Fonts |
 | Project covers / icons | Astro `<Image>` + `sharp`; remote URLs from `old.farukcan.dev` authorized in [`astro.config.mjs`](astro.config.mjs) and optimized into `dist/_astro/` at build |
-| Cache | [`public/_headers`](public/_headers) for Cloudflare Pages: hashed `/_astro/*` immutable; `/`, `/index.html`, `/404.html` short TTL (no catch-all `/*`, so rules do not merge) |
+| Cache | [`public/_headers`](public/_headers) for Cloudflare Pages: hashed `/_astro/*` immutable; HTML short TTL; branding assets 1 week; manifest 1 day (no catch-all `/*`, so rules do not merge) |
+| SEO | [`@astrojs/sitemap`](astro.config.mjs) + [`public/robots.txt`](public/robots.txt) |
 
 Each deploy still needs `api.json` **and** reachable cover/icon URLs; a missing remote image fails the build.
 
@@ -63,11 +64,13 @@ Logo and favicons mirror [farukcan.dev](https://farukcan.dev) (sourced from
 
 | File | Use |
 | ---- | --- |
-| `logo.png` / `android-chrome-512x512.png` | Nav logo, OG/Twitter image |
+| `logo.png` / `android-chrome-512x512.png` | Brand mark (also keep `src/assets/logo.png` in sync for optimized Nav `<Image>`) |
+| `og.png` | Open Graph / Twitter share image (1200×630) |
 | `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` | Browser favicon |
 | `apple-touch-icon.png` | iOS home screen |
 | `android-chrome-192x192.png` / `android-chrome-512x512.png` | Web app manifest icons |
 | `manifest.webmanifest` | Install / Add to Home Screen metadata |
+| `robots.txt` | Crawler rules + sitemap URL |
 
 ## Cloudflare Pages
 
@@ -85,7 +88,7 @@ Static Astro output (`dist/`) deploys directly to Cloudflare Pages. No adapter r
 | Root directory | `/` (repo root) |
 | Node version | `20` (via [`.nvmrc`](.nvmrc) or env `NODE_VERSION=20`) |
 
-[`public/_headers`](public/_headers) is copied into `dist/` and applied by Cloudflare Pages automatically (long-cache for `/_astro/*`, 1h for HTML).
+[`public/_headers`](public/_headers) is copied into `dist/` and applied by Cloudflare Pages automatically (security headers globally; long-cache for `/_astro/*`; 1h for HTML; 1 week for branding assets).
 
 Each deploy re-fetches `https://farukcan.dev/api.json` and optimizes remote project images. If the API or those images are down, the build fails.
 

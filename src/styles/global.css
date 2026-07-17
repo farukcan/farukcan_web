@@ -59,17 +59,36 @@
 }
 
 @layer utilities {
-  /* Scroll-reveal: elements start hidden, JS toggles .is-visible. */
-  .reveal {
+  /* Progressive enhancement: visible by default; hide only when JS opted in. */
+  html.js .reveal {
     opacity: 0;
     transform: translateY(28px);
     transition:
       opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .reveal.is-visible {
+  html.js .reveal.is-visible {
     opacity: 1;
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal,
+  .animate-fadeInUp,
+  .text-gradient {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
