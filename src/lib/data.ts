@@ -4,6 +4,7 @@ import { parse } from "node-html-parser";
 const ORIGIN = "https://old.farukcan.dev";
 const REMOTE_URL = `${ORIGIN}/api.json`;
 const PROJECTS_DB_ID = "59410d89-1e49-4c5a-b22d-6a892432ee04";
+const SERVICES_DB_ID = "9f578cf4-b88c-4462-b01a-8b8974bfceae";
 
 export type Social = {
   label: string;
@@ -30,6 +31,24 @@ export type Project = {
   cover: string | null;
 };
 
+export type Service = {
+  id: string;
+  name: string;
+  description: string;
+  priority: number;
+  /** Notion native icon name (e.g. "code"), or null when unset. */
+  iconName: string | null;
+  /** Notion icon color name (e.g. "gray", "orange"). */
+  iconColor: string;
+};
+
+export type ServicesSection = {
+  title: string;
+  description: string;
+  hideTitle: boolean;
+  items: Service[];
+};
+
 export type SiteData = {
   name: string;
   role: string;
@@ -42,6 +61,7 @@ export type SiteData = {
   skills: SkillSection[];
   techTags: string[];
   projects: Project[];
+  services: ServicesSection;
   categories: string[];
   stats: { value: string; label: string }[];
   generatedAt: string;
@@ -161,11 +181,73 @@ function mapProjects(list: any[]): Project[] {
     .sort((a, b) => b.priority - a.priority || a.name.localeCompare(b.name));
 }
 
+/** Read Notion native page icon: { type: "icon", icon: { name, color } }. */
+function parseNotionIcon(icon: unknown): {
+  name: string | null;
+  color: string;
+} {
+  if (!icon || typeof icon !== "object") return { name: null, color: "gray" };
+  const node = icon as {
+    type?: string;
+    icon?: { name?: string; color?: string };
+  };
+  if (node.type === "icon" && node.icon) {
+    return {
+      name: node.icon.name ?? null,
+      color: node.icon.color ?? "gray",
+    };
+  }
+  return { name: null, color: "gray" };
+}
+
+function richTextPlain(richText: unknown): string {
+  if (!Array.isArray(richText)) return "";
+  return richText
+    .map((t: { plain_text?: string }) => t.plain_text ?? "")
+    .join("")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function mapServices(list: any[]): Service[] {
+  return list
+    .map((row): Service => {
+      const props = row.properties ?? {};
+      const name = props.Name?.title?.[0]?.plain_text ?? "Untitled";
+      const description = richTextPlain(props.Description?.rich_text);
+      const { name: iconName, color: iconColor } = parseNotionIcon(row.icon);
+      return {
+        id: row.id,
+        name,
+        description,
+        priority: props.Priority?.number ?? Number.POSITIVE_INFINITY,
+        iconName,
+        iconColor,
+      };
+    })
+    // DatabaseSort=Priority — lower number first; name tie-break for stability.
+    .sort((a, b) => a.priority - b.priority || a.name.localeCompare(b.name));
+}
+
+function mapServicesSection(raw: any): ServicesSection {
+  const page = (raw.nav ?? []).find(
+    (n: { title?: string }) => n.title === "Services",
+  );
+  const fm = page?.frontmatter ?? {};
+  return {
+    title: fm.title ?? page?.title ?? "Services",
+    description: (fm.desc ?? "").trim(),
+    hideTitle: Boolean(fm.hideTitle),
+    items: mapServices(raw.databases?.[SERVICES_DB_ID]?.list ?? []),
+  };
+}
+
 export async function getSiteData(): Promise<SiteData> {
   const raw = (await loadRaw()) as any;
   const config = raw.configuration ?? {};
   const homeContent: string = raw.homePage?.content ?? "";
   const projects = mapProjects(raw.databases?.[PROJECTS_DB_ID]?.list ?? []);
+  const services = mapServicesSection(raw);
 
   const categories = Array.from(
     new Set(projects.flatMap((p) => p.tags.map((t) => t.name))),
@@ -193,6 +275,7 @@ export async function getSiteData(): Promise<SiteData> {
     skills: extractSkills(homeContent),
     techTags,
     projects,
+    services,
     categories,
     stats: [
       { value: "10+", label: "Years Experience" },

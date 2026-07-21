@@ -34,11 +34,14 @@ flowchart LR
 | Site section | Source in api.json |
 | ------------ | ------------------ |
 | Hero role/tagline | `homePage.content` callout + `configuration` |
+| Services grid | `databases[9f578cf4-…].list` (Name, Description, Priority) + `nav` Services frontmatter (`hideTitle`, title, desc); icons from row `icon` |
 | Skills cards | `homePage.content` `<details>` blocks |
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
-| Projects grid | `databases[<id>].list` (Name, Status, Tags, Link, cover/icon, description) |
+| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, cover/icon, description) |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
+
+Services rows are sorted by `Priority` ascending (per `[DatabaseSort=Priority]`), with name as a stable tie-break. Missing `icon` is tolerated (default sparkles glyph). If data looks stale, check the root `timestamp` on `api.json` — Notion rebuilds lag ~10–15 minutes.
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
