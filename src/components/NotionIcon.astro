@@ -1,0 +1,44 @@
+---
+import {
+  notionIconUrl,
+  resolveNotionIconAccent,
+  resolveNotionIconName,
+} from "../lib/notionIcons";
+
+interface Props {
+  /** Notion native icon name (e.g. "code"). Null → default sparkle. */
+  name?: string | null;
+  /** Notion color token (e.g. "gray", "orange"). */
+  color?: string | null;
+  /** Override accent; defaults from name + color. */
+  accent?: string;
+  class?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+const {
+  name = null,
+  color = "gray",
+  accent: accentProp,
+  class: className = "",
+  size = "md",
+} = Astro.props;
+
+const accent = accentProp ?? resolveNotionIconAccent(name, color);
+const iconName = resolveNotionIconName(name);
+const src = notionIconUrl(iconName);
+
+const sizeClass =
+  size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";
+---
+
+<span
+  class:list={[
+    "inline-block shrink-0",
+    sizeClass,
+    className,
+  ]}
+  style={`background-color:${accent};-webkit-mask-image:url(${src});-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;mask-image:url(${src});mask-size:contain;mask-repeat:no-repeat;mask-position:center`}
+  role="img"
+  aria-label={iconName}
+></span>

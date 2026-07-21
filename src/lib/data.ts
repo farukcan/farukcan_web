@@ -105,7 +105,7 @@ const SOCIAL_MAP: { match: string; label: string }[] = [
   { match: "gitlab.com", label: "GitLab" },
   { match: "hackerrank.com", label: "HackerRank" },
   { match: "npmjs.com", label: "NPM" },
-  { match: "forms.gle", label: "Contact" },
+  { match: "cal.com", label: "Contact" },
 ];
 
 function extractSocials(homeContent: string, twitter: string): Social[] {
@@ -210,23 +210,25 @@ function richTextPlain(richText: unknown): string {
 }
 
 function mapServices(list: any[]): Service[] {
-  return list
-    .map((row): Service => {
-      const props = row.properties ?? {};
-      const name = props.Name?.title?.[0]?.plain_text ?? "Untitled";
-      const description = richTextPlain(props.Description?.rich_text);
-      const { name: iconName, color: iconColor } = parseNotionIcon(row.icon);
-      return {
-        id: row.id,
-        name,
-        description,
-        priority: props.Priority?.number ?? Number.POSITIVE_INFINITY,
-        iconName,
-        iconColor,
-      };
-    })
-    // DatabaseSort=Priority — lower number first; name tie-break for stability.
-    .sort((a, b) => a.priority - b.priority || a.name.localeCompare(b.name));
+  return (
+    list
+      .map((row): Service => {
+        const props = row.properties ?? {};
+        const name = props.Name?.title?.[0]?.plain_text ?? "Untitled";
+        const description = richTextPlain(props.Description?.rich_text);
+        const { name: iconName, color: iconColor } = parseNotionIcon(row.icon);
+        return {
+          id: row.id,
+          name,
+          description,
+          priority: props.Priority?.number ?? Number.POSITIVE_INFINITY,
+          iconName,
+          iconColor,
+        };
+      })
+      // DatabaseSort=Priority — lower number first; name tie-break for stability.
+      .sort((a, b) => a.priority - b.priority || a.name.localeCompare(b.name))
+  );
 }
 
 function mapServicesSection(raw: any): ServicesSection {

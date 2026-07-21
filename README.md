@@ -41,7 +41,7 @@ flowchart LR
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
 
-Services rows are sorted by `Priority` ascending (per `[DatabaseSort=Priority]`), with name as a stable tie-break. Missing `icon` is tolerated (default sparkles glyph). If data looks stale, check the root `timestamp` on `api.json` — Notion rebuilds lag ~10–15 minutes.
+Services rows are sorted by `Priority` ascending (per `[DatabaseSort=Priority]`), with name as a stable tie-break. Row icons use Notion native `icon.name` → [`public/notion-icons/{name}.svg`](public/notion-icons) via [`NotionIcon.astro`](src/components/NotionIcon.astro) (missing names fall back to `sparkle`). If data looks stale, check the root `timestamp` on `api.json` — Notion rebuilds lag ~10–15 minutes.
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
@@ -74,6 +74,7 @@ Logo and favicons mirror [farukcan.dev](https://farukcan.dev) (sourced from
 | `android-chrome-192x192.png` / `android-chrome-512x512.png` | Web app manifest icons |
 | `manifest.webmanifest` | Install / Add to Home Screen metadata |
 | `robots.txt` | Crawler rules + sitemap URL |
+| `notion-icons/*.svg` | Notion page icons (`{name}.svg`); used by `NotionIcon.astro` |
 
 ## Cloudflare Pages
 

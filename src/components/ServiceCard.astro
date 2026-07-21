@@ -1,17 +1,14 @@
 ---
 import type { Service } from "../lib/data";
-import {
-  resolveServiceIconAccent,
-  serviceIconPaths,
-} from "../lib/notionIcons";
+import NotionIcon from "./NotionIcon.astro";
+import { resolveNotionIconAccent } from "../lib/notionIcons";
 
 interface Props {
   service: Service;
 }
 const { service } = Astro.props;
 
-const accent = resolveServiceIconAccent(service.iconName, service.iconColor);
-const paths = serviceIconPaths(service.iconName);
+const accent = resolveNotionIconAccent(service.iconName, service.iconColor);
 ---
 
 <article
@@ -19,20 +16,10 @@ const paths = serviceIconPaths(service.iconName);
 >
   <div
     class="mb-5 flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110"
-    style={`background:${accent}22;color:${accent}`}
+    style={`background:${accent}22`}
     aria-hidden="true"
   >
-    <svg
-      class="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.75"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      viewBox="0 0 24 24"
-    >
-      {paths.map((d) => <path d={d} />)}
-    </svg>
+    <NotionIcon name={service.iconName} color={service.iconColor} size="md" />
   </div>
 
   <h3 class="mb-2 text-lg font-semibold tracking-tight text-apple-light">
