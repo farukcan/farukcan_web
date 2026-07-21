@@ -19,17 +19,6 @@ const NOTION_ICON_COLORS: Record<string, string> = {
   red: "#ff453a",
 };
 
-/** When Notion leaves color as gray, give common icons a distinct accent. */
-const ICON_ACCENT_FALLBACK: Record<string, string> = {
-  code: "#ff9500",
-  robot: "#bf5af2",
-  database: "#34c759",
-  computer: "#2997ff",
-  bug: "#ff453a",
-  puzzle: "#ff2d55",
-  shield: "#ff6b4a",
-};
-
 const DEFAULT_ICON = "sparkle";
 
 const ICONS_DIR = path.join(process.cwd(), "public", "notion-icons");
@@ -63,16 +52,11 @@ export function notionIconUrl(name: string | null | undefined): string {
   return `/notion-icons/${resolveNotionIconName(name)}.svg`;
 }
 
-/** Accent hex for icon wells (Notion color, or name-based fallback when gray). */
+/** Accent hex from Notion icon color token (e.g. "gray" → gray). */
 export function resolveNotionIconAccent(
-  iconName: string | null | undefined,
+  _iconName: string | null | undefined,
   iconColor: string | null | undefined,
 ): string {
   const colorKey = iconColor ?? "gray";
-  const named = NOTION_ICON_COLORS[colorKey];
-  if (colorKey !== "gray" && colorKey !== "default" && named) return named;
-  if (iconName && ICON_ACCENT_FALLBACK[iconName]) {
-    return ICON_ACCENT_FALLBACK[iconName];
-  }
-  return named ?? NOTION_ICON_COLORS.gray;
+  return NOTION_ICON_COLORS[colorKey] ?? NOTION_ICON_COLORS.gray;
 }
