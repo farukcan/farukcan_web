@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Apple system palette (same design language as kadiryaren.dev)
+        // Apple system palette
         "apple-black": "#000000",
         "apple-dark": "#1c1c1e",
         "apple-card": "#141416",

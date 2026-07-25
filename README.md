@@ -2,8 +2,8 @@
 
 Static personal website for **Faruk Can**, generated with [Astro](https://astro.build).
 All content is pulled from `https://farukcan.dev/api.json` at build time, so the site
-re-syncs itself on every build. Design language mirrors kadiryaren.dev (Apple-style dark
-theme, Tailwind, CSS animations).
+re-syncs itself on every build. Design language is Apple-style dark theme,
+Tailwind, and CSS animations.
 
 ## Commands
 
