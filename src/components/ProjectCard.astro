@@ -187,12 +187,13 @@ function formatProjectDate(iso: string | null): string | null {
           <Image
             src={project.cover}
             alt=""
-            width={800}
-            height={450}
+            width={1200}
+            height={1200}
+            fit="inside"
             sizes="(max-width: 640px) 100vw, 40rem"
             loading="lazy"
             decoding="async"
-            class="mb-5 aspect-video w-full rounded-2xl object-cover"
+            class="mb-5 h-auto w-full rounded-2xl"
           />
         )
       }
