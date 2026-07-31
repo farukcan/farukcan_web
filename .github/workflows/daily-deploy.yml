@@ -1,0 +1,22 @@
+name: Daily Cloudflare Deploy
+
+on:
+  schedule:
+    # Midnight UTC (03:00 Turkey / UTC+3)
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages deploy hook
+        env:
+          GH_DEPLOY_HOOK: ${{ secrets.GH_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$GH_DEPLOY_HOOK" ]; then
+            echo "GH_DEPLOY_HOOK secret is not set"
+            exit 1
+          fi
+          curl --fail --silent --show-error -X POST "$GH_DEPLOY_HOOK"
+          echo "Deploy hook triggered successfully"

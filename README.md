@@ -118,6 +118,21 @@ Static Astro output (`dist/`) deploys directly to Cloudflare Pages. No adapter r
 
 Each deploy re-fetches `https://farukcan.dev/api.json` and optimizes remote project images. If the API or those images are down, the build fails.
 
+### Scheduled redeploy (Saima sync)
+
+A GitHub Action ([`.github/workflows/daily-deploy.yml`](.github/workflows/daily-deploy.yml)) runs daily at **00:00 UTC** (03:00 Turkey) and POSTs to the Cloudflare Pages Deploy Hook so the site rebuilds against the latest `api.json`. You can also run it manually via **Actions → Daily Cloudflare Deploy → Run workflow**.
+
+1. Cloudflare Dashboard → your Pages project → **Settings → Builds & deployments → Deploy hooks** → create a hook
+2. GitHub repo → **Settings → Secrets and variables → Actions** → add secret `GH_DEPLOY_HOOK` with the hook URL
+
+```mermaid
+flowchart LR
+    A[GitHub Actions cron] -->|POST| B[GH_DEPLOY_HOOK]
+    B --> C[Cloudflare Pages build]
+    C -->|fetch| D[farukcan.dev/api.json]
+    D --> E[Live site]
+```
+
 ### Path → hash redirects
 
 Unknown paths are handled by [`src/pages/404.astro`](src/pages/404.astro): `/$x` redirects client-side to `/#$x` (e.g. `/games` → `/#games`). Paths that look like files (contain a `.`) fall back to `/`. This avoids a catch-all `_redirects` rule, which on Cloudflare Pages would override real static assets.
