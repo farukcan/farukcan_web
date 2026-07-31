@@ -8,13 +8,13 @@ interface Props {
 const { data } = Astro.props;
 
 const filters = ["All", ...data.categories];
+const PAGE_SIZE = 21;
+const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
 ---
 
 <section id="projects" class="relative border-t border-white/5 py-28">
   <div class="mx-auto max-w-6xl px-6">
-    <div
-      class="reveal mb-10 flex flex-wrap items-end justify-between gap-6"
-    >
+    <div class="reveal mb-10 flex flex-wrap items-end justify-between gap-6">
       <div>
         <p class="font-hand text-2xl text-apple-blue">Portfolio</p>
         <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -46,19 +46,78 @@ const filters = ["All", ...data.categories];
       id="project-grid"
       class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
     >
-      {data.projects.map((p) => <ProjectCard project={p} />)}
+      {
+        data.projects.map((p, i) => (
+          <ProjectCard project={p} initiallyHidden={i >= PAGE_SIZE} />
+        ))
+      }
+    </div>
+
+    <div id="load-more-wrap" class="mt-10 flex justify-center">
+      <button
+        id="load-more-btn"
+        type="button"
+        class:list={[
+          "btn-ghost border-apple-green px-10 py-4 text-base",
+          initialRemaining <= 0 && "hidden",
+        ]}
+        aria-controls="project-grid"
+        aria-expanded="false"
+      >
+        {
+          initialRemaining > 0
+            ? `Load More ${initialRemaining} Projects`
+            : "Load More"
+        }
+      </button>
     </div>
   </div>
 </section>
 
 <script>
-  const buttons =
-    document.querySelectorAll<HTMLButtonElement>(".filter-btn");
-  const cards =
-    document.querySelectorAll<HTMLElement>(".project-card");
+  const PAGE_SIZE = 20;
+
+  const buttons = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+  const cards = document.querySelectorAll<HTMLElement>(".project-card");
+  const loadMoreBtn =
+    document.querySelector<HTMLButtonElement>("#load-more-btn");
 
   const activeCls = ["border-apple-blue", "bg-apple-blue", "text-white"];
   const idleCls = ["border-white/10", "text-apple-gray"];
+
+  let currentFilter = "All";
+  let expanded = false;
+
+  function matchingCards(filter: string): HTMLElement[] {
+    return Array.from(cards).filter((card) => {
+      const tags = (card.dataset.tags ?? "").split(",");
+      return filter === "All" || tags.includes(filter);
+    });
+  }
+
+  function applyVisibility() {
+    const matched = matchingCards(currentFilter);
+    const limit = expanded ? matched.length : PAGE_SIZE;
+
+    cards.forEach((card) => {
+      card.style.display = "none";
+    });
+    matched.forEach((card, i) => {
+      card.style.display = i < limit ? "" : "none";
+    });
+
+    if (!loadMoreBtn) return;
+
+    const remaining = matched.length - PAGE_SIZE;
+    if (!expanded && remaining > 0) {
+      loadMoreBtn.textContent = `Load More ${remaining} Projects`;
+      loadMoreBtn.classList.remove("hidden");
+      loadMoreBtn.setAttribute("aria-expanded", "false");
+    } else {
+      loadMoreBtn.classList.add("hidden");
+      loadMoreBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+  }
 
   function setActive(btn: HTMLButtonElement) {
     buttons.forEach((b) => {
@@ -71,13 +130,17 @@ const filters = ["All", ...data.categories];
 
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const filter = btn.dataset.filter ?? "All";
+      currentFilter = btn.dataset.filter ?? "All";
+      expanded = false;
       setActive(btn);
-      cards.forEach((card) => {
-        const tags = (card.dataset.tags ?? "").split(",");
-        const show = filter === "All" || tags.includes(filter);
-        card.style.display = show ? "" : "none";
-      });
+      applyVisibility();
     });
   });
+
+  loadMoreBtn?.addEventListener("click", () => {
+    expanded = true;
+    applyVisibility();
+  });
+
+  applyVisibility();
 </script>

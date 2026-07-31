@@ -4,8 +4,10 @@ import type { Project } from "../lib/data";
 
 interface Props {
   project: Project;
+  /** Hide on first paint (e.g. beyond the initial page size). */
+  initiallyHidden?: boolean;
 }
-const { project } = Astro.props;
+const { project, initiallyHidden = false } = Astro.props;
 
 const tagNames = project.tags.map((t) => t.name).join(",");
 const Wrapper = project.link ? "a" : "div";
@@ -22,6 +24,7 @@ const coverSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
   class="project-card reveal glass group flex flex-col overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1.5 hover:border-apple-blue/40"
   data-tags={tagNames}
   data-status={project.status}
+  style={initiallyHidden ? "display: none" : undefined}
 >
   <div class="relative aspect-video overflow-hidden bg-apple-dark">
     {
