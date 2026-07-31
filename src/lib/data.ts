@@ -21,6 +21,8 @@ export type Project = {
   id: string;
   name: string;
   description: string;
+  /** Notion page body as HTML (from api.json `parsedContent`). */
+  parsedContent: string;
   status: string;
   statusColor: string;
   tags: { name: string; color: string }[];
@@ -91,6 +93,18 @@ function absUrl(url: string | null | undefined): string | null {
   if (url.startsWith("http")) return url;
   if (url.startsWith("/")) return ORIGIN + url;
   return url;
+}
+
+/** Strip html wrapper and absolutize `/assets/` paths in Notion HTML. */
+function normalizeParsedContent(html: string | null | undefined): string {
+  if (!html) return "";
+  const match = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  let body = (match ? match[1] : html).trim();
+  body = body.replace(
+    /\b(src|href)=(["'])(\/assets\/)/gi,
+    `$1=$2${ORIGIN}$3`,
+  );
+  return body;
 }
 
 async function loadRaw(): Promise<unknown> {
@@ -168,6 +182,7 @@ function mapProjects(list: any[]): Project[] {
         id: row.id,
         name,
         description,
+        parsedContent: normalizeParsedContent(row.parsedContent),
         status,
         statusColor,
         tags,
