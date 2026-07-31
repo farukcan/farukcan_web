@@ -37,7 +37,7 @@ flowchart LR
 | Services grid | `databases[9f578cf4-…].list` (Name, Description, Priority) + `nav` Services frontmatter (`hideTitle`, title, desc); icons from row `icon` |
 | Skills cards | `homePage.content` `<details>` blocks |
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
-| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, cover/icon, description); Status `Removed` is filtered out |
+| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, cover/icon, description); Status `Removed` is filtered out; `Published` first, then by `Priority` desc |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
 

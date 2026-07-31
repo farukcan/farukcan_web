@@ -179,7 +179,12 @@ function mapProjects(list: any[]): Project[] {
       };
     })
     .filter((p) => p.status !== "Removed")
-    .sort((a, b) => b.priority - a.priority || a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      const aPublished = a.status === "Published" ? 1 : 0;
+      const bPublished = b.status === "Published" ? 1 : 0;
+      if (aPublished !== bPublished) return bPublished - aPublished;
+      return b.priority - a.priority;
+    });
 }
 
 /** Read Notion native page icon: { type: "icon", icon: { name, color } }. */
