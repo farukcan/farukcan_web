@@ -178,6 +178,7 @@ function mapProjects(list: any[]): Project[] {
         cover: absUrl(row.coverURL),
       };
     })
+    .filter((p) => p.status !== "Removed")
     .sort((a, b) => b.priority - a.priority || a.name.localeCompare(b.name));
 }
 
