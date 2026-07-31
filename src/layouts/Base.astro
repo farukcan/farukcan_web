@@ -54,6 +54,12 @@ const twitterHandle = twitterUsername
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <script
+      defer
+      src="https://umami.puhulab.com/script.js"
+      data-website-id="c633b1b2-ac35-45de-b8f7-5d7f6371ff22"
+      data-domains="farukcan.dev,www.farukcan.dev,old.farukcan.dev"
+      is:inline></script>
     <script is:inline>
       document.documentElement.classList.add("js");
       // Hide contact UI before paint when ?no-contact-info=yes
@@ -82,6 +88,68 @@ const twitterHandle = twitterUsername
         { threshold: 0.12 },
       );
       document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    </script>
+    <script>
+      // Track every <a> / <button> click via Umami (JS API — avoids data-umami-event
+      // swallowing other click listeners on filter / load-more controls).
+      type UmamiTracker = {
+        track: (
+          eventName: string,
+          eventData?: Record<string, string | number | boolean>,
+        ) => void;
+      };
+
+      function getClickLabel(el: HTMLElement): string {
+        const aria = el.getAttribute("aria-label")?.trim();
+        if (aria) return aria;
+
+        const filter = el.dataset.filter?.trim();
+        if (filter) return filter;
+
+        if (el.id) return el.id;
+
+        const heading = el.querySelector("h3")?.textContent?.trim();
+        if (heading) return heading;
+
+        const text = el.innerText?.trim().replace(/\s+/g, " ");
+        if (text) return text.slice(0, 40);
+
+        if (el instanceof HTMLAnchorElement) {
+          return el.getAttribute("href") || "link";
+        }
+        return "button";
+      }
+
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const el = target.closest("a, button");
+        if (
+          !(el instanceof HTMLAnchorElement || el instanceof HTMLButtonElement)
+        ) {
+          return;
+        }
+        if (el instanceof HTMLButtonElement && el.disabled) return;
+
+        const umami = (window as Window & { umami?: UmamiTracker }).umami;
+        if (!umami?.track) return;
+
+        const tag = el.tagName.toLowerCase();
+        const label = getClickLabel(el);
+        const href =
+          el instanceof HTMLAnchorElement
+            ? (el.getAttribute("href") ?? "")
+            : "";
+        const name = `${tag}: ${label}`.slice(0, 50);
+
+        const data: Record<string, string> = { tag, label: label.slice(0, 100) };
+        if (href) data.href = href.slice(0, 500);
+        if (el.id) data.id = el.id;
+        if (el.dataset.filter) data.filter = el.dataset.filter;
+
+        umami.track(name, data);
+      });
     </script>
   </body>
 </html>

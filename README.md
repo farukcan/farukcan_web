@@ -47,6 +47,28 @@ The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stab
 `/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
 are intentionally not used).
 
+## Analytics (Umami)
+
+Privacy-friendly pageviews + click events via self-hosted [Umami](https://umami.is) at `umami.puhulab.com`. The tracker script is injected in [`src/layouts/Base.astro`](src/layouts/Base.astro).
+
+```mermaid
+flowchart LR
+    A[Visitor click] --> B[delegated listener on document]
+    B -->|closest a or button| C[umami.track]
+    C --> D[umami.puhulab.com]
+    E[Page load] --> F[Umami script.js]
+    F --> D
+```
+
+| What | How |
+| ---- | --- |
+| Pageviews | Automatic (`data-auto-track` default) |
+| `<a>` / `<button>` clicks | Global delegated listener → `umami.track(name, data)` |
+| Event name | `{tag}: {label}` (max 50 chars; label from aria-label, `data-filter`, id, `h3`, or text) |
+| Event data | `tag`, `label`, optional `href` / `id` / `filter` |
+
+JS tracking is used instead of `data-umami-event` so other click handlers (project filters, load more) keep working. Skills Notion HTML links are covered by the same listener. The tracker only runs on `farukcan.dev` / `www` / `old.farukcan.dev` (`data-domains`), so local `astro dev` does not pollute analytics.
+
 ## Performance
 
 Build-time optimizations keep the static site on a single origin at runtime:
