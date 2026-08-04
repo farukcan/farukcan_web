@@ -1,0 +1,22 @@
+name: Daily API Deploy
+
+on:
+  schedule:
+    # 23:50 UTC — 10 minutes before daily Cloudflare deploy (00:00 UTC)
+    - cron: "50 23 * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger-api-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger API deploy hook
+        env:
+          API_DEPLOY_HOOK: ${{ secrets.API_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$API_DEPLOY_HOOK" ]; then
+            echo "API_DEPLOY_HOOK secret is not set"
+            exit 1
+          fi
+          curl --fail --silent --show-error -X GET "$API_DEPLOY_HOOK"
+          echo "API deploy hook triggered successfully"

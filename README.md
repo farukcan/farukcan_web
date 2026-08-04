@@ -120,17 +120,24 @@ Each deploy re-fetches `https://farukcan.dev/api.json` and optimizes remote proj
 
 ### Scheduled redeploy (Saima sync)
 
-A GitHub Action ([`.github/workflows/daily-deploy.yml`](.github/workflows/daily-deploy.yml)) runs daily at **00:00 UTC** (03:00 Turkey) and POSTs to the Cloudflare Pages Deploy Hook so the site rebuilds against the latest `api.json`. You can also run it manually via **Actions → Daily Cloudflare Deploy → Run workflow**.
+Two GitHub Actions run daily so the API refreshes before the site rebuilds:
 
-1. Cloudflare Dashboard → your Pages project → **Settings → Builds & deployments → Deploy hooks** → create a hook
-2. GitHub repo → **Settings → Secrets and variables → Actions** → add secret `GH_DEPLOY_HOOK` with the hook URL
+1. [`.github/workflows/daily-api-deploy.yml`](.github/workflows/daily-api-deploy.yml) at **23:50 UTC** (02:50 Turkey) GETs `API_DEPLOY_HOOK`
+2. [`.github/workflows/daily-deploy.yml`](.github/workflows/daily-deploy.yml) at **00:00 UTC** (03:00 Turkey) POSTs to `GH_DEPLOY_HOOK` so Cloudflare Pages rebuilds against the latest `api.json`
+
+You can also run either manually via **Actions → … → Run workflow**.
+
+1. Create the deploy hooks for the API and for Cloudflare Pages
+2. GitHub repo → **Settings → Secrets and variables → Actions** → add secrets `API_DEPLOY_HOOK` and `GH_DEPLOY_HOOK` with the hook URLs
 
 ```mermaid
 flowchart LR
-    A[GitHub Actions cron] -->|POST| B[GH_DEPLOY_HOOK]
-    B --> C[Cloudflare Pages build]
-    C -->|fetch| D[farukcan.dev/api.json]
-    D --> E[Live site]
+    A[GitHub Actions 23:50 UTC] -->|GET| B[API_DEPLOY_HOOK]
+    B --> C[API refresh]
+    D[GitHub Actions 00:00 UTC] -->|POST| E[GH_DEPLOY_HOOK]
+    E --> F[Cloudflare Pages build]
+    F -->|fetch| G[farukcan.dev/api.json]
+    G --> H[Live site]
 ```
 
 ### Path → hash redirects
