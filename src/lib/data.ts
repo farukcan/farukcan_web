@@ -29,7 +29,12 @@ export type Project = {
   link: string | null;
   date: string | null;
   priority: number;
+  /** File/emoji/external icon URL (from api.json `iconURL`), or null. */
   icon: string | null;
+  /** Notion native icon name when `icon.type === "icon"` (no iconURL). */
+  iconName: string | null;
+  /** Notion icon color name (e.g. "gray", "blue"). */
+  iconColor: string;
   cover: string | null;
 };
 
@@ -178,6 +183,7 @@ function mapProjects(list: any[]): Project[] {
       const description = (row.frontmatter?.firstParagraphs ?? "")
         .replace(/\s+/g, " ")
         .trim();
+      const { name: iconName, color: iconColor } = parseNotionIcon(row.icon);
       return {
         id: row.id,
         name,
@@ -189,7 +195,10 @@ function mapProjects(list: any[]): Project[] {
         link: props.Link?.url ?? null,
         date: props.Date?.date?.start ?? null,
         priority: props.Priority?.number ?? 0,
+        // File/emoji icons ship as iconURL; native Notion icons only have icon.name.
         icon: absUrl(row.iconURL),
+        iconName,
+        iconColor,
         cover: absUrl(row.coverURL),
       };
     })

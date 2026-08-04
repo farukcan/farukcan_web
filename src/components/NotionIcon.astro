@@ -13,7 +13,7 @@ interface Props {
   /** Override accent; defaults from name + color. */
   accent?: string;
   class?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 const {
@@ -29,7 +29,13 @@ const iconName = resolveNotionIconName(name);
 const src = notionIconUrl(iconName);
 
 const sizeClass =
-  size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";
+  size === "sm"
+    ? "h-4 w-4"
+    : size === "lg"
+      ? "h-6 w-6"
+      : size === "xl"
+        ? "h-8 w-8"
+        : "h-5 w-5";
 ---
 
 <span

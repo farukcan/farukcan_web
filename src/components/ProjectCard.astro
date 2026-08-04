@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import type { Project } from "../lib/data";
+import NotionIcon from "./NotionIcon.astro";
 
 interface Props {
   project: Project;
@@ -8,6 +9,7 @@ interface Props {
   initiallyHidden?: boolean;
 }
 const { project, initiallyHidden = false } = Astro.props;
+const hasNativeIcon = !project.icon && Boolean(project.iconName);
 
 const tagNames = project.tags.map((t) => t.name).join(",");
 const dialogId = `project-dialog-${project.id}`;
@@ -81,7 +83,7 @@ function formatProjectDate(iso: string | null): string | null {
     <div class="flex flex-1 flex-col p-6">
       <div class="mb-2 flex items-center gap-2">
         {
-          project.icon && (
+          project.icon ? (
             <Image
               src={project.icon}
               alt=""
@@ -91,6 +93,14 @@ function formatProjectDate(iso: string | null): string | null {
               decoding="async"
               class="h-6 w-6 rounded object-contain"
             />
+          ) : (
+            hasNativeIcon && (
+              <NotionIcon
+                name={project.iconName}
+                color={project.iconColor}
+                size="lg"
+              />
+            )
           )
         }
         <h3 class="text-lg font-semibold text-apple-light">{project.name}</h3>
@@ -129,7 +139,7 @@ function formatProjectDate(iso: string | null): string | null {
     >
       <div class="min-w-0 flex items-center gap-3">
         {
-          project.icon && (
+          project.icon ? (
             <Image
               src={project.icon}
               alt=""
@@ -139,6 +149,14 @@ function formatProjectDate(iso: string | null): string | null {
               decoding="async"
               class="h-8 w-8 shrink-0 rounded object-contain"
             />
+          ) : (
+            hasNativeIcon && (
+              <NotionIcon
+                name={project.iconName}
+                color={project.iconColor}
+                size="xl"
+              />
+            )
           )
         }
         <div class="min-w-0">

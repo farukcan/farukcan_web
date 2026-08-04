@@ -21,6 +21,24 @@ const NOTION_ICON_COLORS: Record<string, string> = {
 
 const DEFAULT_ICON = "sparkle";
 
+/**
+ * Notion API icon names that differ from local SVG filenames in public/notion-icons.
+ * Keep this small — only map names we actually see in api.json.
+ */
+const ICON_ALIASES: Record<string, string> = {
+  art: "paint-palette",
+  book: "book-open",
+  "command-line": "command-line-rectangle",
+  cut: "scissors",
+  drafts: "document",
+  geography: "globe",
+  graduate: "graduation-cap",
+  phone: "phone-smart",
+  playlist: "music-note-list",
+  science: "erlenmeyer-flask",
+  table: "spreadsheet",
+};
+
 const ICONS_DIR = path.join(process.cwd(), "public", "notion-icons");
 
 function loadAvailableIcons(): Set<string> {
@@ -40,7 +58,11 @@ const AVAILABLE = loadAvailableIcons();
 
 /** Resolve a Notion icon name to a file that exists locally. */
 export function resolveNotionIconName(name: string | null | undefined): string {
-  if (name && AVAILABLE.has(name)) return name;
+  if (name) {
+    if (AVAILABLE.has(name)) return name;
+    const alias = ICON_ALIASES[name];
+    if (alias && AVAILABLE.has(alias)) return alias;
+  }
   if (AVAILABLE.has(DEFAULT_ICON)) return DEFAULT_ICON;
   // Last resort: first available icon, or a known pack name.
   const first = AVAILABLE.values().next().value;

@@ -37,11 +37,11 @@ flowchart LR
 | Services grid | `databases[9f578cf4-…].list` (Name, Description, Priority) + `nav` Services frontmatter (`hideTitle`, title, desc); icons from row `icon` |
 | Skills cards | `homePage.content` `<details>` blocks |
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
-| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, Date, cover/icon, description); Status `Removed` is filtered out; `Published` first, then by `Priority` desc; each filter tab shows 20 cards then **Load More N Projects** for the rest. Card click opens a `<dialog>` with `parsedContent` (Notion HTML), Tags, and Date under the title; **Open Link** (header, left of Close) goes to `Link` when set |
+| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, Date, cover/icon, description); Status `Removed` is filtered out; `Published` first, then by `Priority` desc; each filter tab shows 20 cards then **Load More N Projects** for the rest. Card click opens a `<dialog>` with `parsedContent` (Notion HTML), Tags, and Date under the title; **Open Link** (header, left of Close) goes to `Link` when set. Icons: file/emoji via `iconURL`; Notion library icons via row `icon` → `NotionIcon` |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
 
-Services rows are sorted by `Priority` ascending (per `[DatabaseSort=Priority]`), with name as a stable tie-break. Row icons use Notion native `icon.name` → [`public/notion-icons/{name}.svg`](public/notion-icons) via [`NotionIcon.astro`](src/components/NotionIcon.astro) (missing names fall back to `sparkle`). If data looks stale, check the root `timestamp` on `api.json` — Notion rebuilds lag ~10–15 minutes.
+Services rows are sorted by `Priority` ascending (per `[DatabaseSort=Priority]`), with name as a stable tie-break. Row icons use Notion native `icon.name` → [`public/notion-icons/{name}.svg`](public/notion-icons) via [`NotionIcon.astro`](src/components/NotionIcon.astro). Projects use the same path when `iconURL` is empty (`icon.type === "icon"`). API names that differ from local SVG filenames are remapped in [`src/lib/notionIcons.ts`](src/lib/notionIcons.ts) (`ICON_ALIASES`); unknown names fall back to `sparkle`. If data looks stale, check the root `timestamp` on `api.json` — Notion rebuilds lag ~10–15 minutes.
 
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
