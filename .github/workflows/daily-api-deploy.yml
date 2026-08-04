@@ -18,5 +18,5 @@ jobs:
             echo "API_DEPLOY_HOOK secret is not set"
             exit 1
           fi
-          curl --fail --silent --show-error -X GET "$API_DEPLOY_HOOK"
+          curl --fail --silent --show-error -L -X GET "$API_DEPLOY_HOOK"
           echo "API deploy hook triggered successfully"
