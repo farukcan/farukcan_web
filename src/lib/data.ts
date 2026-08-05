@@ -112,6 +112,16 @@ function normalizeParsedContent(html: string | null | undefined): string {
   return body;
 }
 
+/**
+ * Card/preview copy: decode entities (e.g. &#39; → ') and strip tags
+ * so raw markup like <a href="..."> never appears as plain text.
+ */
+function htmlToPlainText(html: string | null | undefined): string {
+  if (!html) return "";
+  const root = parse(`<div>${html}</div>`);
+  return root.text.replace(/\s+/g, " ").trim();
+}
+
 async function loadRaw(): Promise<unknown> {
   const res = await fetch(REMOTE_URL);
   if (!res.ok) throw new Error(`api.json responded ${res.status}`);
@@ -180,9 +190,7 @@ function mapProjects(list: any[]): Project[] {
         name: t.name,
         color: color(t.color),
       }));
-      const description = (row.frontmatter?.firstParagraphs ?? "")
-        .replace(/\s+/g, " ")
-        .trim();
+      const description = htmlToPlainText(row.frontmatter?.firstParagraphs);
       const { name: iconName, color: iconColor } = parseNotionIcon(row.icon);
       return {
         id: row.id,

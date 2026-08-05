@@ -37,7 +37,7 @@ flowchart LR
 | Services grid | `databases[9f578cf4-…].list` (Name, Description, Priority) + `nav` Services frontmatter (`hideTitle`, title, desc); icons from row `icon` |
 | Skills cards | `homePage.content` `<details>` blocks |
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
-| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, Date, cover/icon, description); Status `Removed` is filtered out; `Published` first, then by `Priority` desc; each filter tab shows 20 cards then **Load More N Projects** for the rest. Card click opens a `<dialog>` with `parsedContent` (Notion HTML), Tags, and Date under the title; **Open Link** (header, left of Close) goes to `Link` when set. Icons: file/emoji via `iconURL`; Notion library icons via row `icon` → `NotionIcon` |
+| Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, Date, cover/icon, description); card `description` is `frontmatter.firstParagraphs` run through `htmlToPlainText` (decode entities, strip tags); Status `Removed` is filtered out; `Published` first, then by `Priority` desc; each filter tab shows 20 cards then **Load More N Projects** for the rest. Card click opens a `<dialog>` with `parsedContent` (Notion HTML), Tags, and Date under the title; **Open Link** (header, left of Close) goes to `Link` when set. Icons: file/emoji via `iconURL`; Notion library icons via row `icon` → `NotionIcon` |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
 
