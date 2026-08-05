@@ -75,7 +75,7 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
 </section>
 
 <script>
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 21;
 
   const buttons = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
   const cards = document.querySelectorAll<HTMLElement>(".project-card");
@@ -145,22 +145,26 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
   applyVisibility();
 
   // Project detail modal (native <dialog>).
-  document.querySelectorAll<HTMLElement>("[data-project-open]").forEach((el) => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.projectOpen;
-      if (!id) return;
-      const dialog = document.getElementById(id);
-      if (dialog instanceof HTMLDialogElement) dialog.showModal();
+  document
+    .querySelectorAll<HTMLElement>("[data-project-open]")
+    .forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.projectOpen;
+        if (!id) return;
+        const dialog = document.getElementById(id);
+        if (dialog instanceof HTMLDialogElement) dialog.showModal();
+      });
     });
-  });
 
-  document.querySelectorAll<HTMLDialogElement>(".project-dialog").forEach((dialog) => {
-    dialog
-      .querySelectorAll<HTMLElement>("[data-project-close]")
-      .forEach((btn) => btn.addEventListener("click", () => dialog.close()));
+  document
+    .querySelectorAll<HTMLDialogElement>(".project-dialog")
+    .forEach((dialog) => {
+      dialog
+        .querySelectorAll<HTMLElement>("[data-project-close]")
+        .forEach((btn) => btn.addEventListener("click", () => dialog.close()));
 
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
     });
-  });
 </script>
