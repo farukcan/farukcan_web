@@ -1,5 +1,6 @@
 ---
 import type { SiteData } from "../lib/data";
+import FeaturedProjects from "./FeaturedProjects.astro";
 import ProjectCard from "./ProjectCard.astro";
 
 interface Props {
@@ -12,24 +13,32 @@ const PAGE_SIZE = 21;
 const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
 ---
 
-<section id="projects" class="relative border-t border-white/5 py-28">
+<section id="projects" class="hairline relative py-32">
+  <FeaturedProjects data={data} />
+
   <div class="mx-auto max-w-6xl px-6">
-    <div class="reveal mb-10 flex flex-wrap items-end justify-between gap-6">
-      <div>
-        <p class="font-hand text-2xl text-apple-blue">Portfolio</p>
-        <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-          {data.projects.length} Projects
-        </h2>
-      </div>
+    <div class="mb-14">
+      <p
+        data-reveal
+        class="flex items-center gap-3 font-hand text-2xl text-apple-blue"
+      >
+        Archive
+      </p>
+      <h2
+        data-split="words"
+        class="mt-3 text-4xl font-bold tracking-tight sm:text-5xl"
+      >
+        {data.projects.length} Projects
+      </h2>
     </div>
 
     <!-- Filter chips -->
-    <div id="project-filters" class="reveal mb-10 flex flex-wrap gap-2">
+    <div id="project-filters" data-reveal class="mb-10 flex flex-wrap gap-2">
       {
         filters.map((f, i) => (
           <button
             class:list={[
-              "filter-btn rounded-full border px-4 py-2 text-sm font-medium transition-all",
+              "filter-btn rounded-full border px-4 py-2 text-sm font-medium transition-colors",
               i === 0
                 ? "border-apple-blue bg-apple-blue text-white"
                 : "border-white/10 text-apple-gray hover:text-apple-light",
@@ -44,6 +53,7 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
 
     <div
       id="project-grid"
+      data-reveal-group
       class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
     >
       {
@@ -57,6 +67,7 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
       <button
         id="load-more-btn"
         type="button"
+        data-magnetic
         class:list={[
           "btn-ghost border-apple-green px-10 py-4 text-base",
           initialRemaining <= 0 && "hidden",
@@ -95,6 +106,10 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
     });
   }
 
+  function notifyMotion() {
+    window.dispatchEvent(new Event("motion:refresh"));
+  }
+
   function applyVisibility() {
     const matched = matchingCards(currentFilter);
     const limit = expanded ? matched.length : PAGE_SIZE;
@@ -117,6 +132,8 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
       loadMoreBtn.classList.add("hidden");
       loadMoreBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
     }
+
+    notifyMotion();
   }
 
   function setActive(btn: HTMLButtonElement) {
@@ -144,7 +161,7 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
 
   applyVisibility();
 
-  // Project detail modal (native <dialog>).
+  // Project detail modal (native <dialog>). Featured cards share these ids.
   document
     .querySelectorAll<HTMLElement>("[data-project-open]")
     .forEach((el) => {
@@ -152,19 +169,33 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
         const id = el.dataset.projectOpen;
         if (!id) return;
         const dialog = document.getElementById(id);
-        if (dialog instanceof HTMLDialogElement) dialog.showModal();
+        if (dialog instanceof HTMLDialogElement) {
+          dialog.showModal();
+          window.dispatchEvent(new Event("motion:lock"));
+        }
       });
     });
+
+  function unlockMotion() {
+    window.dispatchEvent(new Event("motion:unlock"));
+  }
 
   document
     .querySelectorAll<HTMLDialogElement>(".project-dialog")
     .forEach((dialog) => {
+      const close = () => {
+        dialog.close();
+        unlockMotion();
+      };
+
       dialog
         .querySelectorAll<HTMLElement>("[data-project-close]")
-        .forEach((btn) => btn.addEventListener("click", () => dialog.close()));
+        .forEach((btn) => btn.addEventListener("click", close));
 
       dialog.addEventListener("click", (event) => {
-        if (event.target === dialog) dialog.close();
+        if (event.target === dialog) close();
       });
+      dialog.addEventListener("close", unlockMotion);
+      dialog.addEventListener("cancel", unlockMotion);
     });
 </script>

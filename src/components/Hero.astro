@@ -7,104 +7,126 @@ interface Props {
 const { data } = Astro.props;
 ---
 
+<!--
+  z-0 + following sections at z-10: while pinned (hero.ts) the rest of the page
+  slides over the hero like a curtain.
+-->
 <section
   id="hero"
-  class="relative flex min-h-screen items-center overflow-hidden pb-20 pt-32"
+  data-hero
+  class="relative z-0 flex min-h-screen items-center overflow-hidden pb-24 pt-36"
 >
-  <!-- Ambient gradient glows -->
-  <div
-    class="animate-pulseGlow pointer-events-none absolute -left-40 top-20 h-96 w-96 rounded-full bg-apple-blue/20 blur-[120px]"
-  >
-  </div>
-  <div
-    class="animate-pulseGlow pointer-events-none absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-apple-purple/20 blur-[120px]"
-  >
+  <div class="dot-grid pointer-events-none absolute inset-0" aria-hidden="true">
   </div>
 
-  <div class="mx-auto w-full max-w-5xl px-6">
-    <p
-      class="animate-fadeInUp mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-apple-gray"
-    >
-      <span class="animate-ledBlink h-2 w-2 rounded-full bg-apple-green"></span>
-      Hello, I'm {data.name}
-    </p>
-
-    <h1
-      class="animate-fadeInUp mb-6 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
-      style="animation-delay:.1s"
-    >
-      <span class="text-gradient">{data.role}</span>
-    </h1>
-
-    <p
-      class="animate-fadeInUp mb-10 max-w-2xl text-lg leading-relaxed text-apple-gray"
-      style="animation-delay:.2s"
-    >
-      {data.tagline}
-    </p>
-
+  <!-- Ambient glows: separate layers so scroll parallax can move them at different speeds. -->
+  <div
+    data-hero-glow="slow"
+    class="pointer-events-none absolute -left-40 top-20 h-[28rem] w-[28rem] will-change-transform"
+  >
     <div
-      class="animate-fadeInUp flex flex-wrap gap-4"
-      style="animation-delay:.3s"
+      class="animate-pulseGlow h-full w-full rounded-full bg-apple-blue/25 blur-[120px]"
     >
-      <a href="#projects" class="btn-primary">View Projects</a>
-      <a href="#contact" data-contact class="btn-ghost">Get in touch</a>
     </div>
-
-    <!-- Stats -->
+  </div>
+  <div
+    data-hero-glow="fast"
+    class="pointer-events-none absolute -right-40 bottom-0 h-[26rem] w-[26rem] will-change-transform"
+  >
     <div
-      class="animate-fadeInUp mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4"
-      style="animation-delay:.4s"
+      class="animate-pulseGlow h-full w-full rounded-full bg-apple-purple/25 blur-[120px]"
     >
-      {
-        data.stats.map((s) => (
-          <div class="glass rounded-2xl px-5 py-6">
-            <div class="text-3xl font-bold text-apple-light">{s.value}</div>
-            <div class="mt-1 text-sm text-apple-gray">{s.label}</div>
-          </div>
-        ))
-      }
     </div>
+  </div>
 
-    <!-- Upwork trust badge -->
-    <div
-      class="animate-fadeInUp mx-auto mt-12 max-w-4xl"
-      style="animation-delay:.5s"
-    >
-      <div
-        class="group relative overflow-hidden rounded-3xl border border-[#14A800]/25 bg-apple-dark/30 p-6 backdrop-blur-xl"
+  <div class="relative mx-auto w-full max-w-5xl px-6">
+    <div data-hero-content>
+      <p
+        data-hero-item
+        class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-apple-gray"
       >
-        <div
-          class="relative z-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8"
+        <span class="animate-ledBlink h-2 w-2 rounded-full bg-apple-green"
+        ></span>
+        Hello, I'm {data.name}
+      </p>
+
+      <h1
+        data-hero-item
+        data-hero-title
+        class="mb-7 text-5xl font-bold leading-[0.98] tracking-[-0.04em] sm:text-7xl lg:text-8xl"
+      >
+        <span class="text-gradient">{data.role}</span>
+      </h1>
+
+      <p
+        data-hero-item
+        data-hero-tagline
+        class="mb-10 max-w-2xl text-lg leading-relaxed text-apple-gray sm:text-xl"
+      >
+        {data.tagline}
+      </p>
+
+      <!-- Wrapper is the intro target so magnetic hover on the buttons never fights it. -->
+      <div data-hero-item class="flex flex-wrap gap-4">
+        <a href="#projects" data-magnetic class="btn-primary">View Projects</a>
+        <a href="#contact" data-contact data-magnetic class="btn-ghost"
+          >Get in touch</a
         >
-          <span class="text-2xl font-bold tracking-tight text-[#14A800]"
-            >Upwork</span
+      </div>
+    </div>
+
+    <!-- Lower layer moves faster than the headline while the hero unpins. -->
+    <div data-hero-lower>
+      <div class="mt-20 grid grid-cols-2 gap-5 sm:grid-cols-4">
+        {
+          data.stats.map((s) => (
+            <div data-hero-item class="glass rounded-2xl px-5 py-6">
+              <div class="text-3xl font-bold tracking-tight text-apple-light sm:text-4xl">
+                {s.value}
+              </div>
+              <div class="mt-1 text-sm text-apple-gray">{s.label}</div>
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- Upwork trust badge -->
+      <div data-hero-item class="mx-auto mt-10 max-w-4xl">
+        <div
+          class="relative overflow-hidden rounded-3xl border border-[#14A800]/25 bg-apple-dark/30 p-6 backdrop-blur-xl"
+        >
+          <div
+            class="relative z-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8"
           >
-          <div class="hidden h-8 w-px bg-white/10 sm:block"></div>
-          <div class="flex items-center gap-2">
-            <span
-              class="flex h-6 w-6 items-center justify-center rounded-full bg-[#14A800]"
+            <span class="text-2xl font-bold tracking-tight text-[#14A800]"
+              >Upwork</span
             >
-              <svg
-                class="h-4 w-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div class="hidden h-8 w-px bg-white/10 sm:block"></div>
+            <div class="flex items-center gap-2">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-full bg-[#14A800]"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="3"
-                  d="M5 13l4 4L19 7"></path>
-              </svg>
-            </span>
-            <span class="text-lg font-semibold text-apple-light"
-              >Top Rated Plus</span
-            >
-          </div>
-          <div class="hidden h-8 w-px bg-white/10 sm:block"></div>
-          <div class="text-lg font-semibold text-apple-light">
-            100% Job Success
+                <svg
+                  class="h-4 w-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="3"
+                    d="M5 13l4 4L19 7"></path>
+                </svg>
+              </span>
+              <span class="text-lg font-semibold text-apple-light"
+                >Top Rated Plus</span
+              >
+            </div>
+            <div class="hidden h-8 w-px bg-white/10 sm:block"></div>
+            <div class="text-lg font-semibold text-apple-light">
+              100% Job Success
+            </div>
           </div>
         </div>
       </div>

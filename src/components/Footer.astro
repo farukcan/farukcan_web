@@ -8,8 +8,10 @@ const { data } = Astro.props;
 const buildDate = new Date(data.generatedAt).toLocaleDateString("en-GB");
 ---
 
-<footer class="border-t border-white/5 bg-apple-black py-12">
+<!-- z-10 keeps it above the pinned hero layer (see index.astro). -->
+<footer class="hairline relative z-10 bg-apple-black py-12">
   <div
+    data-reveal
     class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-6 text-sm text-apple-gray sm:flex-row"
   >
     <p>{data.footer}</p>

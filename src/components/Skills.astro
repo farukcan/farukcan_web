@@ -1,5 +1,6 @@
 ---
 import type { SiteData } from "../lib/data";
+import SectionHeading from "./SectionHeading.astro";
 
 interface Props {
   data: SiteData;
@@ -28,27 +29,40 @@ const rows = Array.from({ length: ROW_COUNT }, (_, row) => {
   return {
     // Two identical halves for a seamless -50% loop.
     tags: [...tags, ...tags],
-    reverse: row % 2 === 1,
+    direction: row % 2 === 1 ? -1 : 1,
     // Staggered durations (seconds) — slower base so motion stays calm.
     duration: 55 + ((row * 13 + 7) % 25),
-    // Phase offset so rows don't start aligned.
-    delay: -((row * 11) % 23),
+    // Phase offset (0..1) so rows don't start aligned.
+    phase: ((row * 11) % 23) / 23,
   };
 });
 ---
 
 <!-- About / marquee -->
-<section id="about" class="relative border-t border-white/5 py-28">
+<section id="about" class="hairline relative py-32">
   <div class="mx-auto max-w-5xl px-6">
-    <h2 class="reveal max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
+    <p
+      data-reveal
+      class="mb-5 flex items-center gap-3 font-hand text-2xl text-apple-blue"
+    >
+      <span
+        class="font-sans text-[11px] font-medium tracking-[0.3em] text-apple-gray/70"
+        >03</span
+      >
+      <span class="h-px w-6 bg-apple-blue/40" aria-hidden="true"></span>
+      About
+    </p>
+    <h2
+      data-split="words"
+      class="max-w-4xl text-3xl font-bold leading-[1.12] tracking-tight sm:text-4xl lg:text-5xl"
+    >
       {data.description}
     </h2>
   </div>
 
   <!--
-    No .reveal / .glass here:
-    - reveal transform fights marquee translate
-    - glass backdrop-filter on moving pills causes jank
+    No glass here: backdrop-filter on constantly moving pills causes jank.
+    Rows are driven by marquee.ts (speed and direction react to scroll velocity).
   -->
   <div
     class="relative mt-16 overflow-hidden py-2 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
@@ -57,11 +71,11 @@ const rows = Array.from({ length: ROW_COUNT }, (_, row) => {
       {
         rows.map((row) => (
           <div
-            class:list={[
-              "flex w-max gap-3 transform-gpu will-change-transform backface-hidden",
-              row.reverse ? "animate-marqueeReverse" : "animate-marquee",
-            ]}
-            style={`animation-duration:${row.duration}s;animation-delay:${row.delay}s`}
+            data-marquee
+            data-direction={row.direction}
+            data-duration={row.duration}
+            data-phase={row.phase}
+            class="flex w-max gap-3 transform-gpu will-change-transform backface-hidden"
           >
             {row.tags.map((t) => (
               <span class="whitespace-nowrap rounded-full border border-white/10 bg-apple-dark/90 px-5 py-2 text-sm text-apple-gray">
@@ -76,17 +90,18 @@ const rows = Array.from({ length: ROW_COUNT }, (_, row) => {
 </section>
 
 <!-- Skill sections -->
-<section id="skills" class="relative border-t border-white/5 py-28">
+<section id="skills" class="hairline relative py-32">
   <div class="mx-auto max-w-5xl px-6">
-    <div class="reveal mb-14">
-      <p class="font-hand text-2xl text-apple-blue">Expertise</p>
-      <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Skills</h2>
-    </div>
+    <SectionHeading index={4} eyebrow="Expertise" title="Skills" />
 
-    <div class="grid gap-6 md:grid-cols-2">
+    <div data-reveal-group class="grid gap-6 md:grid-cols-2">
       {
         data.skills.map((s) => (
-          <div class="reveal glass group rounded-3xl p-8 transition-all duration-500 hover:-translate-y-1 hover:border-apple-blue/40">
+          <div
+            data-reveal
+            data-tilt
+            class="glass group relative overflow-hidden rounded-3xl p-8 transition-[border-color] duration-500 hover:border-apple-blue/40"
+          >
             <h3 class="mb-4 text-xl font-semibold text-apple-light">
               {s.title}
             </h3>

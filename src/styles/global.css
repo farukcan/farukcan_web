@@ -1,4 +1,5 @@
 @import "@fontsource/caveat/latin-400.css";
+@import "lenis/dist/lenis.css";
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +7,7 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Lenis drives smooth scrolling; native smooth would fight it. */
     scroll-padding-top: 6rem;
   }
   body {
@@ -21,6 +22,10 @@
   }
   html[data-no-contact-info] [data-contact-hidden-msg] {
     display: block;
+  }
+  /* lenis.css disables iframes while smoothing; Notion embeds in the modal must stay interactive. */
+  .lenis.lenis-smooth .prose-notion-modal iframe {
+    pointer-events: auto;
   }
 }
 
@@ -50,26 +55,221 @@
     animation: gradient 8s ease infinite;
   }
 
+  /* Transforms are owned by GSAP (magnetic / tilt); only colors transition here. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-apple-blue px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:brightness-110 hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-apple-blue px-7 py-3 text-sm font-semibold text-white transition-[filter,background-color] duration-300 hover:brightness-110;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-apple-light transition-all duration-300 hover:bg-white/5 hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-apple-light transition-[background-color,border-color] duration-300 hover:bg-white/5;
+  }
+
+  /* Soft gradient divider replacing flat section borders. */
+  .hairline {
+    position: relative;
+  }
+  .hairline::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.14),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  /* Faint dot grid with radial falloff behind the hero. */
+  .dot-grid {
+    background-image: radial-gradient(
+      rgba(255, 255, 255, 0.14) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+    mask-image: radial-gradient(
+      ellipse 70% 65% at 50% 40%,
+      #000 10%,
+      transparent 75%
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse 70% 65% at 50% 40%,
+      #000 10%,
+      transparent 75%
+    );
+  }
+
+  /* Film grain: fixed, non-blending layer (cheap to composite). */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+
+  /* Mouse-position spotlight for [data-tilt] cards (vars set by pointer.ts). */
+  [data-tilt] {
+    transform-style: preserve-3d;
+  }
+  [data-tilt]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.09),
+      transparent 45%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  [data-tilt]:hover::after {
+    opacity: 1;
+  }
+
+  /* Custom cursor (desktop, pointer: fine). */
+  html.has-cursor,
+  html.has-cursor a,
+  html.has-cursor button,
+  html.has-cursor [data-cursor] {
+    cursor: none;
+  }
+  /* Native <dialog> is top-layer; the custom cursor cannot paint above it. */
+  html.has-cursor.cursor-paused,
+  html.has-cursor.cursor-paused * {
+    cursor: auto;
+  }
+  html.has-cursor.cursor-paused .cursor {
+    opacity: 0;
+  }
+  .cursor {
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .cursor.is-visible {
+    opacity: 1;
+  }
+  .cursor-dot,
+  .cursor-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 9999px;
+    will-change: transform;
+  }
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    background: #f5f5f7;
+  }
+  .cursor-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 1px solid rgba(245, 245, 247, 0.5);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #000;
+    transition:
+      width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      margin 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.35s ease,
+      border-color 0.35s ease;
+  }
+  .cursor-ring > span {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .cursor.is-hover .cursor-ring {
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
+    background: rgba(245, 245, 247, 0.12);
+    border-color: rgba(245, 245, 247, 0.25);
+  }
+  .cursor.is-label .cursor-dot {
+    opacity: 0;
+  }
+  .cursor.is-label .cursor-ring {
+    width: 76px;
+    height: 76px;
+    margin: -38px 0 0 -38px;
+    background: #f5f5f7;
+    border-color: #f5f5f7;
+  }
+  .cursor.is-label .cursor-ring > span {
+    opacity: 1;
+  }
+
+  /* Mobile menu overlay + hamburger (nav.ts animates it). */
+  .menu-panel {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .menu-bar {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 2px;
+    transition:
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease;
+  }
+  [data-menu-toggle][aria-expanded="true"] .menu-bar:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+  [data-menu-toggle][aria-expanded="true"] .menu-bar:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+  html.menu-open {
+    overflow: hidden;
+  }
+
+  /* Sticky header: condensed state after leaving the hero. */
+  [data-nav] {
+    transition:
+      padding 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.4s ease,
+      border-color 0.4s ease;
+  }
+  header.is-scrolled [data-nav] {
+    padding-block: 0.5rem;
+    background: rgba(18, 18, 20, 0.8);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  [data-nav-link][aria-current="true"] {
+    color: #f5f5f7;
   }
 }
 
 @layer utilities {
-  /* Progressive enhancement: visible by default; hide only when JS opted in. */
-  html.js .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition:
-      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  html.js .reveal.is-visible {
-    opacity: 1;
-    transform: none;
+  /*
+   * Progressive enhancement: everything is visible by default; only when JS
+   * opted in (html.js) do motion targets start hidden and GSAP reveals them.
+   * motion/index.ts removes `js` on failure or reduced motion.
+   */
+  html.js [data-reveal],
+  html.js [data-hero-item],
+  html.js [data-split] {
+    visibility: hidden;
   }
 }
 
@@ -84,9 +284,11 @@
     transition: none !important;
     scroll-behavior: auto !important;
   }
-  .reveal,
-  .animate-fadeInUp,
+  html.js [data-reveal],
+  html.js [data-hero-item],
+  html.js [data-split],
   .text-gradient {
+    visibility: visible !important;
     opacity: 1 !important;
     transform: none !important;
   }
@@ -153,6 +355,15 @@
   height: 1rem;
   margin-right: 0.35rem;
   vertical-align: middle;
+}
+
+/* Featured showcase: hide the native scrollbar (desktop is GSAP-driven). */
+.featured-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.featured-viewport::-webkit-scrollbar {
+  display: none;
 }
 
 /* Native project detail dialog — reset UA centered layout quirks. */

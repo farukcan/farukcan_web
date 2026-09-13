@@ -23,10 +23,13 @@ const data = await getSiteData();
   <Nav name={data.name} />
   <main>
     <Hero data={data} />
-    <Services data={data} />
-    <Projects data={data} />
-    <Skills data={data} />
-    <Contact data={data} />
+    <!-- Opaque, above the pinned hero so it slides over it like a curtain. -->
+    <div class="relative z-10 bg-apple-black">
+      <Services data={data} />
+      <Projects data={data} />
+      <Skills data={data} />
+      <Contact data={data} />
+    </div>
   </main>
   <Footer data={data} />
 </Base>

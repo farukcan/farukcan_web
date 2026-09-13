@@ -3,7 +3,7 @@
 Static personal website for **Faruk Can**, generated with [Astro](https://astro.build).
 All content is pulled from `https://farukcan.dev/api.json` at build time, so the site
 re-syncs itself on every build. Design language is Apple-style dark theme,
-Tailwind, and CSS animations.
+Tailwind, and GSAP + Lenis scroll choreography.
 
 ## Commands
 
@@ -37,6 +37,7 @@ flowchart LR
 | Services grid | `databases[9f578cf4-…].list` (Name, Description, Priority) + `nav` Services frontmatter (`hideTitle`, title, desc); icons from row `icon` |
 | Skills cards | `homePage.content` `<details>` blocks |
 | Tech marquee (3-row endless scroll) | project `Tags` (deduped, shuffled per row) |
+| Featured showcase | First 5 `Published` projects (same sort as the grid). If fewer than 3 are Published, falls back to the first 5 overall. Rendered by [`FeaturedProjects.astro`](src/components/FeaturedProjects.astro); card click opens the existing `project-dialog-{id}` |
 | Projects grid | `databases[59410d89-…].list` (Name, Status, Tags, Link, Date, cover/icon, description); card `description` is `frontmatter.firstParagraphs` run through `htmlToPlainText` (decode entities, strip tags); Status `Removed` is filtered out; `Published` first, then by `Priority` desc; each filter tab shows 20 cards then **Load More N Projects** for the rest. Card click opens a `<dialog>` with `parsedContent` (Notion HTML), Tags, and Date under the title; **Open Link** (header, left of Close) goes to `Link` when set. Icons: file/emoji via `iconURL`; Notion library icons via row `icon` → `NotionIcon` |
 | Socials | anchors in `homePage.content` + `configuration.twitter_username` |
 | Head / OG / Twitter meta | `configuration.title`, `description`, `site_url`, `twitter_username` (+ static `/og.png`) |
@@ -46,6 +47,52 @@ Services rows are sorted by `Priority` ascending (per `[DatabaseSort=Priority]`)
 The transform lives in [`src/lib/data.ts`](src/lib/data.ts). Images use the stable
 `/assets/...` paths served from `https://old.farukcan.dev` (Notion S3 signed URLs expire and
 are intentionally not used).
+
+## Motion
+
+Scroll choreography lives in [`src/scripts/motion`](src/scripts/motion) and is
+imported from [`src/layouts/Base.astro`](src/layouts/Base.astro). GSAP (core +
+ScrollTrigger + SplitText) and Lenis share one `gsap.ticker` loop. If init
+throws, the `js` class is removed so every motion target stays visible.
+
+```mermaid
+flowchart TD
+  Base[Base.astro] --> Entry[motion/index.ts]
+  Entry --> Smooth[Lenis plus gsap.ticker]
+  Entry --> MM[gsap.matchMedia]
+  MM --> Nav[nav]
+  MM --> Hero[hero]
+  MM --> Text[text-reveal]
+  MM --> Sections[sections]
+  MM --> Featured[featured]
+  MM --> Marquee[marquee]
+  MM --> Pointer[pointer]
+  Projects[Projects filter / load more] -->|motion:refresh| Entry
+```
+
+| matchMedia | What it enables |
+| ---------- | --------------- |
+| `(min-width: 768px)` | Hero pin, featured horizontal pin, char-level splits |
+| `(max-width: 767px)` | Mobile menu, snap-x featured, word-level splits, no pins |
+| `(pointer: fine)` | Custom cursor, magnetic buttons, 3D tilt |
+| `(prefers-reduced-motion: reduce)` | Lenis and all scroll tweens are skipped |
+
+`motion:refresh` is a `window` event. The projects filter / load-more script
+dispatches it after changing `display` so ScrollTrigger recomputes positions.
+`motion:lock` / `motion:unlock` stop Lenis and hide the custom cursor (used
+while a project dialog or the mobile menu is open).
+
+| Attribute | Role |
+| --------- | ---- |
+| `data-reveal` | Fade/rise on enter; reverses on the way back up |
+| `data-reveal-group` | Staggered `ScrollTrigger.batch` for child `data-reveal` |
+| `data-split="words\|chars\|lines"` | SplitText scrub reveal |
+| `data-parallax="<px>"` | Vertical drift while the section crosses the viewport |
+| `data-magnetic` | Pull toward the pointer (also `.btn-primary` / `.btn-ghost`) |
+| `data-tilt` | 3D tilt + spotlight (`--mx` / `--my`) |
+| `data-cursor="Open"` | Custom cursor grows and shows the label |
+| `data-marquee` | Endless row; `data-direction`, `data-duration`, `data-phase` |
+| `data-featured` | Pinned horizontal showcase (desktop) / scroll-snap (mobile) |
 
 ## Analytics (Umami)
 
@@ -75,6 +122,7 @@ Build-time optimizations keep the static site on a single origin at runtime:
 
 | Topic | Approach |
 | ----- | -------- |
+| Motion (GSAP + Lenis) | One deferred module; pins / cursor / tilt disabled on small screens and `prefers-reduced-motion`; only `transform` / `opacity` are animated |
 | Handwriting font (Caveat) | Self-hosted via `@fontsource/caveat` (latin 400 only); no Google Fonts |
 | Project covers / icons | Astro `<Image>` + `sharp`; remote URLs from `old.farukcan.dev` authorized in [`astro.config.mjs`](astro.config.mjs) and optimized into `dist/_astro/` at build |
 | Cache | [`public/_headers`](public/_headers) for Cloudflare Pages: hashed `/_astro/*` immutable; HTML short TTL; branding assets 1 week; manifest 1 day (no catch-all `/*`, so rules do not merge) |

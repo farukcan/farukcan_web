@@ -1,0 +1,47 @@
+---
+/**
+ * Numbered editorial section header: eyebrow fades in ([data-reveal]),
+ * title reveals word by word on scroll ([data-split]).
+ */
+interface Props {
+  index: number;
+  eyebrow: string;
+  title: string;
+  align?: "left" | "center";
+  class?: string;
+}
+const {
+  index,
+  eyebrow,
+  title,
+  align = "left",
+  class: className,
+} = Astro.props;
+
+const number = String(index).padStart(2, "0");
+const centered = align === "center";
+---
+
+<div class:list={["mb-14", centered && "text-center", className]}>
+  <p
+    data-reveal
+    class:list={[
+      "flex items-center gap-3 font-hand text-2xl text-apple-blue",
+      centered && "justify-center",
+    ]}
+  >
+    <span
+      class="font-sans text-[11px] font-medium tracking-[0.3em] text-apple-gray/70"
+      >{number}</span
+    >
+    <span class="h-px w-6 bg-apple-blue/40" aria-hidden="true"></span>
+    {eyebrow}
+  </p>
+  <h2
+    data-split="words"
+    class="mt-3 text-4xl font-bold tracking-tight sm:text-5xl"
+  >
+    {title}
+  </h2>
+  <slot />
+</div>

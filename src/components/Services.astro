@@ -1,6 +1,7 @@
 ---
 import type { SiteData } from "../lib/data";
 import ServiceCard from "./ServiceCard.astro";
+import SectionHeading from "./SectionHeading.astro";
 
 interface Props {
   data: SiteData;
@@ -9,25 +10,27 @@ const { data } = Astro.props;
 const { title, description, hideTitle, items } = data.services;
 ---
 
-<section id="services" class="relative border-t border-white/5 py-28">
+<section id="services" class="hairline relative py-32">
   <div class="mx-auto max-w-6xl px-6">
     {
       !hideTitle && (
-        <div class="reveal mb-14 text-center">
-          <p class="font-hand text-2xl text-apple-blue">What I do</p>
-          <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            {title}
-          </h2>
+        <SectionHeading index={1} eyebrow="What I do" title={title} align="center">
           {description && (
-            <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-apple-gray sm:text-lg">
+            <p
+              data-reveal
+              class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-apple-gray sm:text-lg"
+            >
               {description}
             </p>
           )}
-        </div>
+        </SectionHeading>
       )
     }
 
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      data-reveal-group
+      class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+    >
       {items.map((s) => <ServiceCard service={s} />)}
     </div>
   </div>

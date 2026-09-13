@@ -30,21 +30,9 @@ export default {
         hand: ["Caveat", "cursive"],
       },
       keyframes: {
-        fadeInUp: {
-          "0%": { opacity: "0", transform: "translateY(24px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
         gradient: {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
-        },
-        marquee: {
-          "0%": { transform: "translate3d(0,0,0)" },
-          "100%": { transform: "translate3d(-50%,0,0)" },
-        },
-        marqueeReverse: {
-          "0%": { transform: "translate3d(-50%,0,0)" },
-          "100%": { transform: "translate3d(0,0,0)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
@@ -66,10 +54,7 @@ export default {
         },
       },
       animation: {
-        fadeInUp: "fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
         gradient: "gradient 8s ease infinite",
-        marquee: "marquee 40s linear infinite",
-        marqueeReverse: "marqueeReverse 40s linear infinite",
         float: "float 6s ease-in-out infinite",
         pulseGlow: "pulseGlow 5s ease-in-out infinite",
         ledBlink: "ledBlink 1.6s ease-in-out infinite",

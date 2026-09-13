@@ -1,0 +1,136 @@
+---
+import { Image } from "astro:assets";
+import type { SiteData } from "../lib/data";
+import NotionIcon from "./NotionIcon.astro";
+import SectionHeading from "./SectionHeading.astro";
+
+interface Props {
+  data: SiteData;
+}
+const { data } = Astro.props;
+
+// Prefer Published; fall back to the overall priority order if fewer than 3.
+const published = data.projects.filter((p) => p.status === "Published");
+const featured = (published.length >= 3 ? published : data.projects).slice(0, 5);
+const total = featured.length;
+const totalLabel = String(total).padStart(2, "0");
+---
+
+{
+  total > 0 && (
+    <div data-featured class="mb-24">
+      <div class="mx-auto max-w-6xl px-6">
+        <SectionHeading index={2} eyebrow="Selected work" title="Featured" />
+      </div>
+
+      <div
+        data-featured-viewport
+        class="featured-viewport mt-2 overflow-x-auto snap-x snap-mandatory md:overflow-hidden md:snap-none"
+      >
+        <div
+          data-featured-track
+          class="flex w-max gap-6 px-6 will-change-transform md:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]"
+        >
+          {featured.map((project, i) => {
+            const dialogId = `project-dialog-${project.id}`;
+            const hasNativeIcon = !project.icon && Boolean(project.iconName);
+            return (
+              <article
+                data-featured-card
+                class="relative w-[72vw] shrink-0 snap-start overflow-hidden rounded-3xl border border-white/10 bg-apple-card md:w-[42vw]"
+              >
+                <button
+                  type="button"
+                  class="absolute inset-0 z-10"
+                  data-project-open={dialogId}
+                  data-cursor="Open"
+                  aria-haspopup="dialog"
+                  aria-controls={dialogId}
+                  aria-label={`Open project ${project.name}`}
+                />
+
+                <div class="relative aspect-[16/10] overflow-hidden bg-apple-dark">
+                  {project.cover ? (
+                    <Image
+                      src={project.cover}
+                      alt={project.name}
+                      width={960}
+                      height={600}
+                      sizes="(max-width: 768px) 72vw, 42vw"
+                      loading={i < 2 ? "eager" : "lazy"}
+                      decoding="async"
+                      data-featured-cover
+                      class="absolute inset-0 h-full w-[130%] max-w-none object-cover"
+                    />
+                  ) : (
+                    <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-apple-dark to-black">
+                      <span class="font-hand text-5xl text-white/20">
+                        {project.name}
+                      </span>
+                    </div>
+                  )}
+                  <div
+                    class="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/80 to-transparent"
+                    aria-hidden="true"
+                  />
+                </div>
+
+                <div class="relative z-[1] -mt-16 px-6 pb-6">
+                  <div class="mb-2 flex items-center gap-2">
+                    {project.icon ? (
+                      <Image
+                        src={project.icon}
+                        alt=""
+                        width={24}
+                        height={24}
+                        loading="lazy"
+                        decoding="async"
+                        class="h-6 w-6 rounded object-contain"
+                      />
+                    ) : (
+                      hasNativeIcon && (
+                        <NotionIcon
+                          name={project.iconName}
+                          color={project.iconColor}
+                          size="lg"
+                        />
+                      )
+                    )}
+                    <h3 class="text-xl font-semibold tracking-tight text-apple-light sm:text-2xl">
+                      {project.name}
+                    </h3>
+                  </div>
+                  {project.tags.length > 0 && (
+                    <div class="flex flex-wrap gap-2">
+                      {project.tags.slice(0, 4).map((t) => (
+                        <span
+                          class="rounded-full px-2.5 py-1 text-xs font-medium"
+                          style={`background:${t.color}22;color:${t.color}`}
+                        >
+                          {t.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      <div class="mx-auto mt-8 flex max-w-6xl items-center gap-5 px-6">
+        <p class="shrink-0 font-medium tabular-nums text-apple-light">
+          <span data-featured-index>01</span>
+          <span class="text-apple-gray"> / {totalLabel}</span>
+        </p>
+        <div class="h-px flex-1 overflow-hidden bg-white/10">
+          <div
+            data-featured-progress
+            class="h-full w-full origin-left scale-x-0 bg-gradient-to-r from-apple-blue to-apple-purple"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}

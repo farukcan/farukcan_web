@@ -11,8 +11,11 @@ const { service } = Astro.props;
 const accent = resolveNotionIconAccent(service.iconName, service.iconColor);
 ---
 
+<!-- Transforms are owned by GSAP (reveal + tilt); only colors transition here. -->
 <article
-  class="reveal glass group flex flex-col rounded-2xl p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-white/20"
+  data-reveal
+  data-tilt
+  class="glass group relative flex flex-col overflow-hidden rounded-2xl p-7 transition-[border-color] duration-500 hover:border-white/20"
 >
   <div
     class="mb-5 flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110"

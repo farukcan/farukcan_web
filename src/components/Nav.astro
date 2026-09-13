@@ -16,8 +16,17 @@ const links = [
 ];
 ---
 
-<header class="fixed inset-x-0 top-0 z-50 px-4 pt-4">
+<!-- Scroll progress (kept outside the header so hide-on-scroll never hides it). -->
+<div
+  data-scroll-progress
+  class="pointer-events-none fixed inset-x-0 top-0 z-[51] h-[2px] origin-left scale-x-0 bg-gradient-to-r from-apple-blue via-apple-purple to-apple-pink"
+  aria-hidden="true"
+>
+</div>
+
+<header data-header class="fixed inset-x-0 top-0 z-50 px-4 pt-4">
   <nav
+    data-nav
     class="glass mx-auto flex max-w-5xl items-center justify-between rounded-full px-6 py-3"
   >
     <a
@@ -34,19 +43,70 @@ const links = [
       />
       <span>{name}<span class="text-apple-blue">.</span></span>
     </a>
+
     <ul class="hidden items-center gap-8 text-sm text-apple-gray md:flex">
       {
         links.map((l) => (
           <li {...(l.contact ? { "data-contact": "" } : {})}>
-            <a href={l.href} class="transition-colors hover:text-apple-light">
+            <a
+              href={l.href}
+              data-nav-link
+              class="transition-colors hover:text-apple-light"
+            >
               {l.label}
             </a>
           </li>
         ))
       }
     </ul>
-    <a href="#contact" data-contact class="btn-primary !px-5 !py-2 text-xs"
-      >Get in touch</a
-    >
+
+    <div class="flex items-center gap-2">
+      <a
+        href="#contact"
+        data-contact
+        data-magnetic
+        class="btn-primary !px-5 !py-2 text-xs">Get in touch</a
+      >
+      <button
+        type="button"
+        data-menu-toggle
+        class="flex h-9 w-9 flex-col items-center justify-center gap-[5px] rounded-full text-apple-light transition-colors hover:bg-white/10 md:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open menu"
+      >
+        <span class="menu-bar"></span>
+        <span class="menu-bar"></span>
+      </button>
+    </div>
   </nav>
 </header>
+
+<!-- Fullscreen mobile menu (below the header so the toggle stays reachable). -->
+<div
+  id="mobile-menu"
+  data-menu-panel
+  class="menu-panel fixed inset-0 z-40 flex flex-col justify-between bg-apple-black/80 px-8 pb-10 pt-32 backdrop-blur-2xl md:hidden"
+>
+  <ul class="flex flex-col gap-2">
+    {
+      links.map((l, i) => (
+        <li data-menu-item {...(l.contact ? { "data-contact": "" } : {})}>
+          <a
+            href={l.href}
+            data-nav-link
+            class="flex items-baseline gap-4 py-3 text-4xl font-bold tracking-tight text-apple-gray transition-colors hover:text-apple-light"
+          >
+            <span class="font-sans text-xs tracking-[0.3em] text-apple-gray/60">
+              0{i + 1}
+            </span>
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p data-menu-item class="text-sm text-apple-gray">
+    {name} <span class="text-apple-blue">.</span>
+  </p>
+</div>
