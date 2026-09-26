@@ -81,6 +81,10 @@ flowchart TD
 dispatches it after changing `display` so ScrollTrigger recomputes positions.
 `motion:lock` / `motion:unlock` stop Lenis and hide the custom cursor (used
 while a project dialog or the mobile menu is open).
+`motion:scroll-to` is a `CustomEvent` (`detail.id`, `detail.immediate`) from the
+projects hash handler; motion scrolls that element with Lenis after a
+ScrollTrigger refresh. `motion:ready` fires when motion has booted or was
+skipped, so that scroll does not run before pins exist.
 
 | Attribute | Role |
 | --------- | ---- |
@@ -190,8 +194,21 @@ flowchart LR
 
 ### Path → hash redirects
 
-Unknown paths are handled by [`src/pages/404.astro`](src/pages/404.astro): `/$x` redirects client-side to `/#$x` (e.g. `/games` → `/#games`). Paths that look like files (contain a `.`) fall back to `/`. This avoids a catch-all `_redirects` rule, which on Cloudflare Pages would override real static assets.
+Unknown paths are handled by [`src/pages/404.astro`](src/pages/404.astro): `/$x` redirects client-side to `/#$x` (e.g. `/contact` → `/#contact`). Paths that look like files (contain a `.`) fall back to `/`. This avoids a catch-all `_redirects` rule, which on Cloudflare Pages would override real static assets.
+
+### Project filter hashes
+
+On load and on `hashchange`, [`Projects.astro`](src/components/Projects.astro) reads the fragment. If it matches a project filter chip, that tab is selected and the page jumps to `#project-archive` (the archive heading and filters, past the pinned featured scroller). Matching ignores case and punctuation (`Desktop App` ≡ `#desktop-app`) and accepts one trailing plural `s` when the stem is at least 3 characters (`#games` → `Game`). Page-section hashes (`#hero`, `#services`, `#projects`, `#about`, `#skills`, `#contact`) and any fragment that is already an element id keep normal in-page scrolling and do not change the active tab.
+
+```mermaid
+flowchart TD
+  H[location.hash] --> N{Page section or element id?}
+  N -->|yes| S[Leave the tab alone]
+  N -->|no| F{Matches a filter chip?}
+  F -->|yes| A[Select tab and jump to the archive]
+  F -->|no| I[Keep the current tab]
+```
 
 ### Hide contact UI
 
-Append `?no-contact-info=yes` to the URL to hide Contact nav/CTA links, the Contact section, and footer social links (replaced with “Contact Info is hidden”). Example: `/?no-contact-info=yes`. The `/games` path redirects to `/?no-contact-info=yes#projects` for the same effect.
+Append `?no-contact-info=yes` to the URL to hide Contact nav/CTA links, the Contact section, and footer social links (replaced with “Contact Info is hidden”). Example: `/?no-contact-info=yes`. The `/games` path redirects to `/?no-contact-info=yes#projects` for the same effect (that hash is the projects section, so it does not select the Game tab; `/#games` does).

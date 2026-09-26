@@ -16,7 +16,7 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
 <section id="projects" class="hairline relative py-32">
   <FeaturedProjects data={data} />
 
-  <div class="mx-auto max-w-6xl px-6">
+  <div id="project-archive" class="mx-auto max-w-6xl px-6">
     <div class="mb-14">
       <p
         data-reveal
@@ -145,12 +145,152 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
     btn.classList.add(...activeCls);
   }
 
+  function selectFilter(btn: HTMLButtonElement) {
+    currentFilter = btn.dataset.filter ?? "All";
+    expanded = false;
+    setActive(btn);
+    applyVisibility();
+  }
+
+  /** Compare hash fragments and tag names independent of case and punctuation. */
+  function normalizeKey(value: string): string {
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\+\+/g, "plusplus")
+      .replace(/#/g, "sharp")
+      .replace(/\+/g, "plus")
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  const pageSections = new Set([
+    "hero",
+    "services",
+    "projects",
+    "about",
+    "skills",
+    "contact",
+  ]);
+
+  function hashFragment(): string {
+    const raw = location.hash.replace(/^#/, "").trim();
+    if (!raw) return "";
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  }
+
+  /** Real in-page anchors keep native / Lenis scrolling and do not change the tab. */
+  function isNativeAnchor(fragment: string): boolean {
+    if (pageSections.has(normalizeKey(fragment))) return true;
+    return document.getElementById(fragment) != null;
+  }
+
+  function findFilterButton(fragment: string): HTMLButtonElement | null {
+    const key = normalizeKey(fragment);
+    if (!key) return null;
+
+    const aliases = new Set<string>([key]);
+    if (key.endsWith("s") && key.length > 3) aliases.add(key.slice(0, -1));
+    else if (!key.endsWith("s") && key.length >= 3) aliases.add(`${key}s`);
+
+    let match: HTMLButtonElement | null = null;
+    let score = 0;
+    buttons.forEach((btn) => {
+      const filterKey = normalizeKey(btn.dataset.filter ?? "");
+      if (!filterKey || !aliases.has(filterKey)) return;
+      const next = filterKey === key ? 2 : 1;
+      if (next > score) {
+        match = btn;
+        score = next;
+      }
+    });
+    return match;
+  }
+
+  let pendingImmediate: boolean | null = null;
+  let motionWait: { timer: number; finish: () => void } | null = null;
+
+  function cancelPendingScroll() {
+    if (!motionWait) return;
+    window.clearTimeout(motionWait.timer);
+    window.removeEventListener("motion:ready", motionWait.finish);
+    motionWait = null;
+    pendingImmediate = null;
+  }
+
+  function scrollToProjects(immediate: boolean) {
+    // Land on the archive, past the pinned featured scroller.
+    const native = () => {
+      document.getElementById("project-archive")?.scrollIntoView({ block: "start" });
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      cancelPendingScroll();
+      native();
+      return;
+    }
+
+    const dispatch = (instant: boolean) => {
+      if (document.documentElement.dataset.motionReady == null) {
+        native();
+        return;
+      }
+      window.dispatchEvent(
+        new CustomEvent("motion:scroll-to", {
+          detail: { id: "project-archive", immediate: instant },
+        }),
+      );
+    };
+
+    if (document.documentElement.dataset.motionReady != null) {
+      cancelPendingScroll();
+      dispatch(immediate);
+      return;
+    }
+
+    pendingImmediate = immediate;
+    if (motionWait) return;
+
+    const finish = () => {
+      if (!motionWait) return;
+      window.clearTimeout(motionWait.timer);
+      window.removeEventListener("motion:ready", motionWait.finish);
+      motionWait = null;
+      const instant = pendingImmediate ?? false;
+      pendingImmediate = null;
+      dispatch(instant);
+    };
+
+    motionWait = { timer: window.setTimeout(finish, 2500), finish };
+    window.addEventListener("motion:ready", finish, { once: true });
+  }
+
+  function applyHashFilter(immediate: boolean): boolean {
+    const fragment = hashFragment();
+    if (!fragment || isNativeAnchor(fragment)) {
+      cancelPendingScroll();
+      return false;
+    }
+    const btn = findFilterButton(fragment);
+    if (!btn) {
+      cancelPendingScroll();
+      return false;
+    }
+    selectFilter(btn);
+    scrollToProjects(immediate);
+    return true;
+  }
+
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      currentFilter = btn.dataset.filter ?? "All";
-      expanded = false;
-      setActive(btn);
-      applyVisibility();
+      selectFilter(btn);
     });
   });
 
@@ -159,7 +299,11 @@ const initialRemaining = Math.max(0, data.projects.length - PAGE_SIZE);
     applyVisibility();
   });
 
-  applyVisibility();
+  if (!applyHashFilter(true)) applyVisibility();
+
+  window.addEventListener("hashchange", () => {
+    applyHashFilter(true);
+  });
 
   // Project detail modal (native <dialog>). Featured cards share these ids.
   document

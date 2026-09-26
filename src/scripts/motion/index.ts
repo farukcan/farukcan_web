@@ -18,9 +18,14 @@ function disableMotion() {
   html.classList.remove("js");
 }
 
+function signalMotionReady() {
+  window.dispatchEvent(new Event("motion:ready"));
+}
+
 function boot() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     disableMotion();
+    signalMotionReady();
     return;
   }
 
@@ -32,6 +37,29 @@ function boot() {
   const lenis = initSmoothScroll();
   window.addEventListener("motion:lock", () => lenis.stop());
   window.addEventListener("motion:unlock", () => lenis.start());
+  // Projects hash routing scrolls here once pins exist (see Projects.astro).
+  window.addEventListener("motion:scroll-to", (event: Event) => {
+    const detail = (
+      event as CustomEvent<{ id?: string; immediate?: boolean }>
+    ).detail;
+    const id = detail?.id;
+    if (!id) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    ScrollTrigger.refresh();
+    // Pin spacers land after Lenis measures the page; its resize observer
+    // is debounced, so an immediate scroll would clamp inside the featured pin.
+    lenis.resize();
+    lenis.scrollTo(target, {
+      // Lenis already subtracts scroll-padding-top. A second offset
+      // drops the archive by another nav height.
+      offset: 0,
+      immediate: detail.immediate === true,
+      force: true,
+    });
+    // Release a pin that was active before this jump (featured scroller).
+    ScrollTrigger.update();
+  });
 
   // Runs once; lives outside matchMedia so breakpoint changes never replay it.
   initHeroIntro();
@@ -67,6 +95,7 @@ function boot() {
   document.fonts?.ready.then(refresh);
   window.addEventListener("load", refresh, { once: true });
   html.dataset.motionReady = "";
+  signalMotionReady();
 }
 
 try {
@@ -74,4 +103,5 @@ try {
 } catch (error) {
   console.error("[motion] init failed, falling back to static content", error);
   disableMotion();
+  signalMotionReady();
 }
